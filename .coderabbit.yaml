@@ -1,0 +1,45 @@
+language: "pt-BR"
+reviews:
+  profile: "assertive"
+  poem: false
+  sequence_diagrams: true
+  collapse_walkthrough: false
+  suggested_labels: false
+
+  request_filters:
+    branches:
+      - "main"
+      - "homologacao"
+  path_filters:
+    - "!**/build/**"
+    - "!**/.gradle/**"
+    - "!**/build.gradle**"
+    - "!**/out/**"
+    - "!**/bin/**"
+    - "!**/dist/**"
+    - "!**/.idea/**"
+    - "!**/*.iml"
+    - "!**/.vscode/**"
+    - "!**/gradlew**"
+    - "!**/gradlew.bat**"
+    - "!**/gradle/**"
+  path_instructions:
+    - path: "*/*.java"
+      instructions: |
+        - VOCÊ DEVE RESPONDER, GERAR RESUMOS E FAZER TODOS OS COMENTÁRIOS ESTRITAMENTE EM PORTUGUÊS DO BRASIL (pt-BR). NÃO USE INGLÊS.
+        - Atue como um Tech Lead do projeto de Automatização de Cálculos Hidráulicos (TCC), avaliando o código de forma rigorosa segundo os padrões abaixo.
+        - Métodos curtos: máximo 15 linhas. Caso exceda, exija a refatoração.
+        - Responsabilidade Única (SRP) obrigatória em cada método.
+        - Nomes de classes, métodos e atributos devem ser descritivos e obrigatoriamente em PORTUGUÊS.
+        - Classes do tipo Model devem obrigatoriamente ter o sufixo "Model" (ex: UsuarioModel, PrumadaModel).
+        - PROIBIDO o uso de @Data do Lombok. Utilize @Getter e @Setter separadamente.
+        - Não permita código duplicado. Comente trechos complexos.
+        - Padrão de carregamento OBRIGATÓRIO: `@ManyToOne(fetch = FetchType.LAZY)`.
+        - Uso de `CascadeType.ALL` como padrão. Verifique o risco de exclusão em massa em operações de DELETE.
+        - Campos booleanos com valor padrão devem usar `@Builder.Default` para evitar conflito com o Lombok.
+        - Operações de escrita (INSERT, UPDATE, DELETE) devem estar em uma transação única.
+        - PROIBIDO o uso de `java.util.Date`. Exija sempre a nova API: `java.time` (LocalDate, LocalDateTime).
+        - Regras de negócio DEVEM estar isoladas na camada Service.
+        - O retorno para o Frontend deve ser feito via DTOs (sufixo DTO). Não exponha entidades do banco diretamente.
+        - Endpoints REST devem seguir o padrão: GET para consultas, POST para criação, PATCH para atualizações parciais.
+        - Controle de acesso por perfil (ADMIN, ENGENHEIRO) deve ser feito via `@PreAuthorize` na camada Controller.
