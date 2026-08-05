@@ -2,6 +2,8 @@ package api.sistema.hidro.service;
 
 import api.sistema.hidro.dto.PrumadaConsultaDTO;
 import api.sistema.hidro.dto.PrumadaRespostaDTO;
+import api.sistema.hidro.enums.TipoPrumada;
+import api.sistema.hidro.exception.RecursoNaoEncontradoException;
 import api.sistema.hidro.model.PrumadaModel;
 import api.sistema.hidro.repository.PrumadaRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +26,7 @@ public class PrumadaService {
                         faixa,
                         dto.getDesconector(),
                         dto.getCondicaoSanca())
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Nenhuma configuração encontrada para os parâmetros informados"));
 
         return new PrumadaRespostaDTO(
@@ -35,8 +37,8 @@ public class PrumadaService {
                 prumada.getDescricao());
     }
 
-    private String resolverFaixaPavimentos(String tipo, Integer num) {
-        if (tipo.equals("COZINHA")) {
+    private String resolverFaixaPavimentos(TipoPrumada tipo, Integer num) {
+        if (tipo == TipoPrumada.COZINHA) {
             if (num <= 9) return "ATE_9";
             if (num <= 16) return "ATE_16";
             if (num <= 18) return "ATE_18";
@@ -50,7 +52,14 @@ public class PrumadaService {
         }
     }
 
-    public List<PrumadaModel> listarTodos(String tipo) {
-        return prumadaRepository.findByTipoAndAtivoTrue(tipo);
+    public List<PrumadaRespostaDTO> listarTodos(TipoPrumada tipo) {
+        return prumadaRepository.findByTipoAndAtivoTrue(tipo).stream()
+                .map(prumada -> new PrumadaRespostaDTO(
+                        prumada.getTipo(),
+                        prumada.getNumPavimentos(),
+                        prumada.getDesconector(),
+                        prumada.getCondicaoSanca(),
+                        prumada.getDescricao()))
+                .toList();
     }
 }

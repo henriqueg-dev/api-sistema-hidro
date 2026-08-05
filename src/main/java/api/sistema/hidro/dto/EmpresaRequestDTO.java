@@ -7,6 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EmpresaRequestDTO {
-    @NotBlank(message = "Nome é obrigatório")
+    @NotBlank(message = "Nome Ã© obrigatÃ³rio")
     private String nome;
 }

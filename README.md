@@ -18,7 +18,7 @@ O projeto surgiu da necessidade real identificada na rotina de escritórios de e
 ## 🏗️ Arquitetura
 
 ```
-Frontend (Vue.js 3)  ⇄  Backend (Spring Boot 3)  ⇄  Banco de Dados (PostgreSQL)
+Frontend (Vue.js 3)  ⇄  Backend (Spring Boot 4)  ⇄  Banco de Dados (PostgreSQL)
 ```
 
 ---
@@ -27,7 +27,7 @@ Frontend (Vue.js 3)  ⇄  Backend (Spring Boot 3)  ⇄  Banco de Dados (PostgreS
 
 ### Backend
 - **Java 21**
-- **Spring Boot 3**
+- **Spring Boot 4**
 - **Spring Security** com autenticação via **JWT**
 - **Spring Data JPA** + **Hibernate**
 - **PostgreSQL 16**
@@ -127,13 +127,13 @@ git clone https://github.com/seu-usuario/sistema-hidro.git
 CREATE DATABASE hidro_db;
 ```
 
-3. Configure o `application.properties`:
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/hidro_db
-spring.datasource.username=seu_usuario
-spring.datasource.password=sua_senha
-jwt.secret=sua-chave-secreta
-jwt.expiration=86400000
+3. Configure as credenciais via variáveis de ambiente (recomendado, evita segredos em texto plano no repositório). O `application.properties` já traz valores padrão para desenvolvimento local, mas em produção defina:
+```bash
+export DB_URL=jdbc:postgresql://localhost:5432/hidro_db
+export DB_USERNAME=seu_usuario
+export DB_PASSWORD=sua_senha
+export JWT_SECRET=sua-chave-secreta
+export JWT_EXPIRATION=86400000
 ```
 
 4. Rode o projeto:

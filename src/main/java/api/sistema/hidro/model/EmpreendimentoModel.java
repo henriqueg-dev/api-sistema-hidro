@@ -1,5 +1,6 @@
 package api.sistema.hidro.model;
 
+import api.sistema.hidro.enums.TipoEmpreendimento;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -22,8 +23,9 @@ public class EmpreendimentoModel {
     @Column(nullable = false)
     private String nome;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String tipo;
+    private TipoEmpreendimento tipo;
 
     @Column(nullable = false)
     private Integer numPavimentos;
@@ -34,7 +36,7 @@ public class EmpreendimentoModel {
     @Column(nullable = false)
     private String concessionaria;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empresa_id", nullable = false)
     private EmpresaModel empresa;
 
