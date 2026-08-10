@@ -1,6 +1,7 @@
 package api.sistema.hidro.repository;
 
 import api.sistema.hidro.enums.CondicaoSanca;
+import api.sistema.hidro.enums.FaixaPavimentos;
 import api.sistema.hidro.enums.TipoPrumada;
 import api.sistema.hidro.model.PrumadaModel;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,7 +17,7 @@ public interface PrumadaRepository extends JpaRepository<PrumadaModel, Long> {
 
     Optional<PrumadaModel> findByTipoAndNumPavimentosAndDesconectorAndCondicaoSanca(
             TipoPrumada tipo,
-            String numPavimentos,
+            FaixaPavimentos numPavimentos,
             String desconector,
             CondicaoSanca condicaoSanca);
 }
