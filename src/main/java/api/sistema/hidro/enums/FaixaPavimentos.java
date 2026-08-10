@@ -16,13 +16,11 @@ public enum FaixaPavimentos {
         this.descricao = descricao;
     }
 
-    /** Valor enviado nas respostas da API: "Até 9 pavimentos" em vez de ATE_9. */
     @JsonValue
     public String getDescricao() {
         return descricao;
     }
 
-    /** Nas requisições aceita tanto a constante (ATE_9) quanto a descrição. */
     @JsonCreator
     public static FaixaPavimentos fromJson(String valor) {
         if (valor == null || valor.isBlank()) return null;
@@ -34,10 +32,6 @@ public enum FaixaPavimentos {
         throw new IllegalArgumentException("Faixa de pavimentos inválida: " + valor);
     }
 
-    /**
-     * Converte o número de pavimentos informado na consulta na faixa normativa
-     * correspondente. Prumadas de cozinha não possuem faixa própria até 5 pavimentos.
-     */
     public static FaixaPavimentos resolver(TipoPrumada tipo, int numPavimentos) {
         if (numPavimentos <= 5 && tipo == TipoPrumada.ARS) return ATE_5;
         if (numPavimentos <= 9) return ATE_9;

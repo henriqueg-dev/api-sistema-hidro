@@ -13,13 +13,11 @@ public enum TipoPrumada {
         this.descricao = descricao;
     }
 
-    /** Valor enviado nas respostas da API. */
     @JsonValue
     public String getDescricao() {
         return descricao;
     }
 
-    /** Nas requisições aceita tanto a constante (COZINHA) quanto a descrição. */
     @JsonCreator
     public static TipoPrumada fromJson(String valor) {
         if (valor == null || valor.isBlank()) return null;

@@ -15,13 +15,11 @@ public enum CondicaoSanca {
         this.descricao = descricao;
     }
 
-    /** Valor enviado nas respostas da API: "Entre 1,2m e 1,8m" em vez de ENTRE_1_2_E_1_8. */
     @JsonValue
     public String getDescricao() {
         return descricao;
     }
 
-    /** Nas requisições aceita tanto a constante (ENTRE_1_2_E_1_8) quanto a descrição. */
     @JsonCreator
     public static CondicaoSanca fromJson(String valor) {
         if (valor == null || valor.isBlank()) return null;

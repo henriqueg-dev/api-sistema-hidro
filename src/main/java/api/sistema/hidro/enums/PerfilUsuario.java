@@ -13,13 +13,11 @@ public enum PerfilUsuario {
         this.descricao = descricao;
     }
 
-    /** Valor enviado nas respostas da API. */
     @JsonValue
     public String getDescricao() {
         return descricao;
     }
 
-    /** Nas requisições aceita tanto a constante (ADMIN) quanto a descrição. */
     @JsonCreator
     public static PerfilUsuario fromJson(String valor) {
         if (valor == null || valor.isBlank()) return null;
