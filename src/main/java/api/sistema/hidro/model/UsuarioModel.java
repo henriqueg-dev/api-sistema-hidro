@@ -18,7 +18,7 @@ public class UsuarioModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false)
     private String nome;
@@ -37,6 +37,7 @@ public class UsuarioModel {
     private Boolean ativo = true;
 
     @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime criadoEm;
 }
 

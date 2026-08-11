@@ -3,6 +3,7 @@ package api.sistema.hidro.dto;
 import api.sistema.hidro.enums.TipoEmpreendimento;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,6 +17,7 @@ public class EmpreendimentoRequestDTO {
     private TipoEmpreendimento tipo;
 
     @NotNull(message = "Número de pavimentos é obrigatório")
+    @Positive(message = "Número de pavimentos deve ser maior que zero")
     private Integer numPavimentos;
 
     @NotBlank(message = "Endereço é obrigatório")

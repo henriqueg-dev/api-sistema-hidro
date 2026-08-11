@@ -4,6 +4,7 @@ import api.sistema.hidro.enums.CondicaoSanca;
 import api.sistema.hidro.enums.TipoPrumada;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,6 +16,7 @@ public class PrumadaConsultaDTO {
     private TipoPrumada tipo;
 
     @NotNull(message = "Número de pavimentos é obrigatório")
+    @Positive(message = "Número de pavimentos deve ser maior que zero")
     private Integer numPavimentos;
 
     @NotBlank(message = "Desconector é obrigatório")

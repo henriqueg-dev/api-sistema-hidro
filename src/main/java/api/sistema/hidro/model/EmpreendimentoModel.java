@@ -45,5 +45,6 @@ public class EmpreendimentoModel {
     private Boolean ativo = true;
 
     @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime criadoEm;
 }

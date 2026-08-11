@@ -9,16 +9,19 @@ import api.sistema.hidro.repository.EmpreendimentoRepository;
 import api.sistema.hidro.repository.EmpresaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class EmpreendimentoService {
 
     private final EmpreendimentoRepository empreendimentoRepository;
     private final EmpresaRepository empresaRepository;
 
+    @Transactional
     public EmpreendimentoResponseDTO criar(EmpreendimentoRequestDTO dto) {
         EmpresaModel empresa = empresaRepository.findById(dto.getEmpresaId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Empresa não encontrada"));

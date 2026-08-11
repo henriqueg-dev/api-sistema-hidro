@@ -9,11 +9,13 @@ import api.sistema.hidro.model.PrumadaModel;
 import api.sistema.hidro.repository.PrumadaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PrumadaService {
 
     private final PrumadaRepository prumadaRepository;

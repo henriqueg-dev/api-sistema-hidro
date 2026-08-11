@@ -9,16 +9,19 @@ import api.sistema.hidro.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public UsuarioResponseDTO criar(UsuarioRequestDTO dto) {
         if (usuarioRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new RegraNegocioException("Email já cadastrado");
@@ -43,6 +46,7 @@ public class UsuarioService {
                 .toList();
     }
 
+    @Transactional
     public UsuarioResponseDTO alterarStatus(Long id, Boolean ativo) {
         UsuarioModel usuarioModel = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));

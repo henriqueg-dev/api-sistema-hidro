@@ -24,6 +24,7 @@ public class UsuarioDetailsService implements UserDetailsService {
                 .username(usuarioModel.getEmail())
                 .password(usuarioModel.getSenha())
                 .roles(usuarioModel.getPerfil().name())
+                .disabled(!Boolean.TRUE.equals(usuarioModel.getAtivo()))
                 .build();
     }
 }
