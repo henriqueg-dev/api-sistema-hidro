@@ -1,5 +1,8 @@
 package api.sistema.hidro.model;
 
+import api.sistema.hidro.enums.CondicaoSanca;
+import api.sistema.hidro.enums.FaixaPavimentos;
+import api.sistema.hidro.enums.TipoPrumada;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,17 +19,20 @@ public class PrumadaModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String tipo;
+    private TipoPrumada tipo;
 
-    @Column(nullable = false)
-    private String numPavimentos;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "num_pavimentos", nullable = false)
+    private FaixaPavimentos numPavimentos;
 
     @Column(nullable = false)
     private String desconector;
 
+    @Enumerated(EnumType.STRING)
     @Column
-    private String condicaoSanca;
+    private CondicaoSanca condicaoSanca;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String descricao;

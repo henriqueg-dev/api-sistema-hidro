@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "tb_empresa")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,7 +17,7 @@ public class EmpresaModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false)
     private String nome;
@@ -26,5 +27,6 @@ public class EmpresaModel {
     private Boolean ativo = true;
 
     @CreationTimestamp
-    private LocalDateTime criadoEm = LocalDateTime.now();
+    @Column(updatable = false)
+    private LocalDateTime criadoEm;
 }

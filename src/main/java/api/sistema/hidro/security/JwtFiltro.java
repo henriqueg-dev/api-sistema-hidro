@@ -9,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -38,8 +39,20 @@ public class JwtFiltro extends OncePerRequestFilter {
         String token = authHeader.substring(7);
 
         if (jwtUtil.tokenValido(token)) {
-            String email = jwtUtil.extrairEmail(token);
+            autenticar(request, jwtUtil.extrairEmail(token));
+        }
+
+        filterChain.doFilter(request, response);
+    }
+
+    private void autenticar(HttpServletRequest request, String email) {
+        try {
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
+            // Usuário desativado ou removido após a emissão do token não segue autenticado
+            if (!userDetails.isEnabled()) {
+                return;
+            }
 
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(
@@ -47,8 +60,8 @@ public class JwtFiltro extends OncePerRequestFilter {
 
             auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(auth);
+        } catch (UsernameNotFoundException ex) {
+            logger.debug("Token com usuário inexistente");
         }
-
-        filterChain.doFilter(request, response);
     }
 }

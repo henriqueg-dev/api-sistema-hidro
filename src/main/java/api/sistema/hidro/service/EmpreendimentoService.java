@@ -2,25 +2,29 @@ package api.sistema.hidro.service;
 
 import api.sistema.hidro.dto.EmpreendimentoRequestDTO;
 import api.sistema.hidro.dto.EmpreendimentoResponseDTO;
+import api.sistema.hidro.exception.RecursoNaoEncontradoException;
 import api.sistema.hidro.model.EmpreendimentoModel;
 import api.sistema.hidro.model.EmpresaModel;
 import api.sistema.hidro.repository.EmpreendimentoRepository;
 import api.sistema.hidro.repository.EmpresaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class EmpreendimentoService {
 
     private final EmpreendimentoRepository empreendimentoRepository;
     private final EmpresaRepository empresaRepository;
 
+    @Transactional
     public EmpreendimentoResponseDTO criar(EmpreendimentoRequestDTO dto) {
         EmpresaModel empresa = empresaRepository.findById(dto.getEmpresaId())
-                .orElseThrow(() -> new RuntimeException("Empresa n„o encontrada"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Empresa n√£o encontrada"));
 
         EmpreendimentoModel empreendimento = EmpreendimentoModel.builder()
                 .nome(dto.getNome())

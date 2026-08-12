@@ -2,11 +2,13 @@ package api.sistema.hidro.dto;
 
 import api.sistema.hidro.enums.PerfilUsuario;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 public class UsuarioResponseDTO {
     private Long id;

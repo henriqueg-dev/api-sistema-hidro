@@ -2,6 +2,7 @@ package api.sistema.hidro.service;
 
 import api.sistema.hidro.dto.LoginRequest;
 import api.sistema.hidro.dto.LoginResponse;
+import api.sistema.hidro.exception.RecursoNaoEncontradoException;
 import api.sistema.hidro.model.UsuarioModel;
 import api.sistema.hidro.repository.UsuarioRepository;
 import api.sistema.hidro.security.JwtUtil;
@@ -24,7 +25,7 @@ public class AuthService {
                         request.getEmail(), request.getSenha()));
 
         UsuarioModel usuarioModel = usuarioRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
 
         String token = jwtUtil.gerarToken(usuarioModel.getEmail(), usuarioModel.getPerfil().name());
 
