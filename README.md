@@ -118,34 +118,51 @@ tb_prumada (tabelas normativas)
 ### Backend
 
 1. Clone o repositório:
-```bash
-git clone https://github.com/seu-usuario/sistema-hidro.git
-```
 
-2. Crie o banco de dados no PostgreSQL:
-```sql
-CREATE DATABASE hidro_db;
-```
+   ```bash
+   git clone https://github.com/henriqueg-dev/sistema-hidro.git
+   ```
 
-3. Configure as credenciais via variáveis de ambiente (recomendado, evita segredos em texto plano no repositório). O `application.properties` já traz valores padrão para desenvolvimento local, mas em produção defina:
-```bash
-export DB_URL=jdbc:postgresql://localhost:5432/hidro_db
-export DB_USERNAME=seu_usuario
-export DB_PASSWORD=sua_senha
-export JWT_SECRET=sua-chave-secreta
-export JWT_EXPIRATION=86400000
-```
+1. Crie o banco de dados no PostgreSQL:
 
-4. Rode o projeto:
-```bash
-./gradlew bootRun
-```
+   ```sql
+   CREATE DATABASE hidro_db;
+   ```
 
-5. Insira o usuário admin no banco:
-```sql
-INSERT INTO tb_usuario (nome, email, senha, perfil, ativo)
-VALUES ('Administrador', 'admin@hidro.com', '$2a$10$HASH_BCRYPT_AQUI', 'ADMIN', true);
-```
+1. Defina o profile ativo. Para execução local basta o profile `dev`, que já é o padrão quando `SPRING_PROFILES_ACTIVE` não está definida:
+
+   ```bash
+   export SPRING_PROFILES_ACTIVE=dev
+   ```
+
+   O profile `dev` já traz os valores locais de banco (`localhost/hidro_db`, `postgres/postgres`) e um segredo JWT de desenvolvimento.
+
+1. Configure as credenciais via variáveis de ambiente (evita segredos em texto plano no repositório). Em produção, todas são obrigatórias:
+
+   ```bash
+   export SPRING_PROFILES_ACTIVE=prod
+   export DB_URL=jdbc:postgresql://localhost:5432/hidro_db
+   export DB_USERNAME=seu_usuario
+   export DB_PASSWORD=sua_senha
+   export JWT_SECRET=troque-por-uma-chave-aleatoria-de-no-minimo-32-bytes
+   export JWT_EXPIRATION=86400000
+   export CORS_ALLOWED_ORIGINS=https://app.seu-dominio.com
+   ```
+
+   > O `JWT_SECRET` precisa ter ao menos 32 bytes (256 bits) para o algoritmo HMAC-SHA256.
+
+1. Rode o projeto:
+
+   ```bash
+   ./gradlew bootRun
+   ```
+
+1. Insira o usuário admin no banco:
+
+   ```sql
+   INSERT INTO tb_usuario (nome, email, senha, perfil, ativo)
+   VALUES ('Administrador', 'admin@hidro.com', '$2a$10$HASH_BCRYPT_AQUI', 'ADMIN', true);
+   ```
 
 ---
 

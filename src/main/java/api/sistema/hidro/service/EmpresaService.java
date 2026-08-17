@@ -35,9 +35,20 @@ public class EmpresaService {
     }
 
     public EmpresaResponseDTO buscarPorId(Long id) {
-        EmpresaModel empresa = empresaRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Empresa não encontrada"));
+        return toDTO(buscarEntidade(id));
+    }
+
+    @Transactional
+    public EmpresaResponseDTO atualizar(Long id, EmpresaRequestDTO dto) {
+        EmpresaModel empresa = buscarEntidade(id);
+        empresa.setNome(dto.getNome());
+        empresaRepository.save(empresa);
         return toDTO(empresa);
+    }
+
+    private EmpresaModel buscarEntidade(Long id) {
+        return empresaRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Empresa não encontrada"));
     }
 
     private EmpresaResponseDTO toDTO(EmpresaModel e) {

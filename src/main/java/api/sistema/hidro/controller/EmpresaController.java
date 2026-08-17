@@ -34,4 +34,10 @@ public class EmpresaController {
     public ResponseEntity<EmpresaResponseDTO> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(empresaService.buscarPorId(id));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<EmpresaResponseDTO> atualizar(@PathVariable Long id,
+                                                        @RequestBody @Valid EmpresaRequestDTO dto) {
+        return ResponseEntity.ok(empresaService.atualizar(id, dto));
+    }
 }
