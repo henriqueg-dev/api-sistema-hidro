@@ -46,6 +46,15 @@ public class EmpreendimentoService {
                 .toList();
     }
 
+    public EmpreendimentoResponseDTO buscarPorId(Long id) {
+        return toDTO(buscarEntidade(id));
+    }
+
+    private EmpreendimentoEntity buscarEntidade(Long id) {
+        return empreendimentoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Empreendimento não encontrado"));
+    }
+
     private EmpreendimentoResponseDTO toDTO(EmpreendimentoEntity e) {
         return new EmpreendimentoResponseDTO(
                 e.getId(), e.getNome(), e.getTipo(),

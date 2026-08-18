@@ -31,4 +31,9 @@ public class EmpreendimentoController {
             @PathVariable Long empresaId) {
         return ResponseEntity.ok(empreendimentoService.listarPorEmpresa(empresaId));
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<EmpreendimentoResponseDTO> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(empreendimentoService.buscarPorId(id));
+    }
 }
