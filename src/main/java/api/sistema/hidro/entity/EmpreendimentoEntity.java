@@ -1,4 +1,4 @@
-package api.sistema.hidro.model;
+package api.sistema.hidro.entity;
 
 import api.sistema.hidro.enums.TipoEmpreendimento;
 import jakarta.persistence.*;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EmpreendimentoModel {
+public class EmpreendimentoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +38,7 @@ public class EmpreendimentoModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empresa_id", nullable = false)
-    private EmpresaModel empresa;
+    private EmpresaEntity empresa;
 
     @Builder.Default
     @Column(nullable = false)

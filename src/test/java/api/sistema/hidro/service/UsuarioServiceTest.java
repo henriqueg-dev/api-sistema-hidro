@@ -5,7 +5,7 @@ import api.sistema.hidro.dto.UsuarioResponseDTO;
 import api.sistema.hidro.enums.PerfilUsuario;
 import api.sistema.hidro.exception.RecursoNaoEncontradoException;
 import api.sistema.hidro.exception.RegraNegocioException;
-import api.sistema.hidro.model.UsuarioModel;
+import api.sistema.hidro.entity.UsuarioEntity;
 import api.sistema.hidro.repository.UsuarioRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -58,13 +58,13 @@ class UsuarioServiceTest {
         dto.setEmail("existente@hidro.com");
 
         when(usuarioRepository.findByEmail("existente@hidro.com"))
-                .thenReturn(Optional.of(new UsuarioModel()));
+                .thenReturn(Optional.of(new UsuarioEntity()));
 
         assertThatThrownBy(() -> usuarioService.criar(dto))
                 .isInstanceOf(RegraNegocioException.class)
                 .hasMessage("Email já cadastrado");
 
-        verify(usuarioRepository, never()).save(any(UsuarioModel.class));
+        verify(usuarioRepository, never()).save(any(UsuarioEntity.class));
     }
 
     @Test

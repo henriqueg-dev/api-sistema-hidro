@@ -3,8 +3,8 @@ package api.sistema.hidro.service;
 import api.sistema.hidro.dto.EmpreendimentoRequestDTO;
 import api.sistema.hidro.dto.EmpreendimentoResponseDTO;
 import api.sistema.hidro.exception.RecursoNaoEncontradoException;
-import api.sistema.hidro.model.EmpreendimentoModel;
-import api.sistema.hidro.model.EmpresaModel;
+import api.sistema.hidro.entity.EmpreendimentoEntity;
+import api.sistema.hidro.entity.EmpresaEntity;
 import api.sistema.hidro.repository.EmpreendimentoRepository;
 import api.sistema.hidro.repository.EmpresaRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +23,10 @@ public class EmpreendimentoService {
 
     @Transactional
     public EmpreendimentoResponseDTO criar(EmpreendimentoRequestDTO dto) {
-        EmpresaModel empresa = empresaRepository.findById(dto.getEmpresaId())
+        EmpresaEntity empresa = empresaRepository.findById(dto.getEmpresaId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Empresa não encontrada"));
 
-        EmpreendimentoModel empreendimento = EmpreendimentoModel.builder()
+        EmpreendimentoEntity empreendimento = EmpreendimentoEntity.builder()
                 .nome(dto.getNome())
                 .tipo(dto.getTipo())
                 .numPavimentos(dto.getNumPavimentos())
@@ -46,7 +46,7 @@ public class EmpreendimentoService {
                 .toList();
     }
 
-    private EmpreendimentoResponseDTO toDTO(EmpreendimentoModel e) {
+    private EmpreendimentoResponseDTO toDTO(EmpreendimentoEntity e) {
         return new EmpreendimentoResponseDTO(
                 e.getId(), e.getNome(), e.getTipo(),
                 e.getNumPavimentos(), e.getEndereco(),

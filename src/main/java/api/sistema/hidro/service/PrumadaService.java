@@ -5,7 +5,7 @@ import api.sistema.hidro.dto.PrumadaRespostaDTO;
 import api.sistema.hidro.enums.FaixaPavimentos;
 import api.sistema.hidro.enums.TipoPrumada;
 import api.sistema.hidro.exception.RecursoNaoEncontradoException;
-import api.sistema.hidro.model.PrumadaModel;
+import api.sistema.hidro.entity.PrumadaEntity;
 import api.sistema.hidro.repository.PrumadaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class PrumadaService {
     public PrumadaRespostaDTO consultar(PrumadaConsultaDTO dto) {
         FaixaPavimentos faixa = FaixaPavimentos.resolver(dto.getTipo(), dto.getNumPavimentos());
 
-        PrumadaModel prumada = prumadaRepository
+        PrumadaEntity prumada = prumadaRepository
                 .findByTipoAndNumPavimentosAndDesconectorAndCondicaoSanca(
                         dto.getTipo(),
                         faixa,

@@ -4,7 +4,7 @@ import api.sistema.hidro.dto.UsuarioRequestDTO;
 import api.sistema.hidro.dto.UsuarioResponseDTO;
 import api.sistema.hidro.exception.RecursoNaoEncontradoException;
 import api.sistema.hidro.exception.RegraNegocioException;
-import api.sistema.hidro.model.UsuarioModel;
+import api.sistema.hidro.entity.UsuarioEntity;
 import api.sistema.hidro.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,7 +27,7 @@ public class UsuarioService {
             throw new RegraNegocioException("Email já cadastrado");
         }
 
-        UsuarioModel usuarioModel = UsuarioModel.builder()
+        UsuarioEntity usuarioEntity = UsuarioEntity.builder()
                 .nome(dto.getNome())
                 .email(dto.getEmail())
                 .senha(passwordEncoder.encode(dto.getSenha()))
@@ -35,8 +35,8 @@ public class UsuarioService {
                 .ativo(true)
                 .build();
 
-        usuarioRepository.save(usuarioModel);
-        return toDTO(usuarioModel);
+        usuarioRepository.save(usuarioEntity);
+        return toDTO(usuarioEntity);
     }
 
     public List<UsuarioResponseDTO> listarTodos() {
@@ -48,20 +48,20 @@ public class UsuarioService {
 
     @Transactional
     public UsuarioResponseDTO alterarStatus(Long id, Boolean ativo) {
-        UsuarioModel usuarioModel = usuarioRepository.findById(id)
+        UsuarioEntity usuarioEntity = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
-        usuarioModel.setAtivo(ativo);
-        usuarioRepository.save(usuarioModel);
-        return toDTO(usuarioModel);
+        usuarioEntity.setAtivo(ativo);
+        usuarioRepository.save(usuarioEntity);
+        return toDTO(usuarioEntity);
     }
 
-    private UsuarioResponseDTO toDTO(UsuarioModel usuarioModel) {
+    private UsuarioResponseDTO toDTO(UsuarioEntity usuarioEntity) {
         return new UsuarioResponseDTO(
-                usuarioModel.getId(),
-                usuarioModel.getNome(),
-                usuarioModel.getEmail(),
-                usuarioModel.getPerfil(),
-                usuarioModel.getAtivo(),
-                usuarioModel.getCriadoEm());
+                usuarioEntity.getId(),
+                usuarioEntity.getNome(),
+                usuarioEntity.getEmail(),
+                usuarioEntity.getPerfil(),
+                usuarioEntity.getAtivo(),
+                usuarioEntity.getCriadoEm());
     }
 }

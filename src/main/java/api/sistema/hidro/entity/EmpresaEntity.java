@@ -1,6 +1,5 @@
-package api.sistema.hidro.model;
+package api.sistema.hidro.entity;
 
-import api.sistema.hidro.enums.PerfilUsuario;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -8,13 +7,13 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tb_usuario")
+@Table(name = "tb_empresa")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UsuarioModel {
+public class EmpresaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,21 +22,11 @@ public class UsuarioModel {
     @Column(nullable = false)
     private String nome;
 
-    @Column(nullable = false, unique = true)
-    private String email;
-
-    @Column(nullable = false)
-    private String senha;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private PerfilUsuario perfil;
-
     @Builder.Default
+    @Column(nullable = false)
     private Boolean ativo = true;
 
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime criadoEm;
 }
-

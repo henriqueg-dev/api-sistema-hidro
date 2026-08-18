@@ -3,7 +3,7 @@ package api.sistema.hidro.service;
 import api.sistema.hidro.dto.EmpresaRequestDTO;
 import api.sistema.hidro.dto.EmpresaResponseDTO;
 import api.sistema.hidro.exception.RecursoNaoEncontradoException;
-import api.sistema.hidro.model.EmpresaModel;
+import api.sistema.hidro.entity.EmpresaEntity;
 import api.sistema.hidro.repository.EmpresaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,12 +37,12 @@ class EmpresaServiceTest {
         EmpresaResponseDTO resposta = empresaService.criar(dto);
 
         assertThat(resposta.getNome()).isEqualTo("Construtora Alfa");
-        verify(empresaRepository).save(any(EmpresaModel.class));
+        verify(empresaRepository).save(any(EmpresaEntity.class));
     }
 
     @Test
     void deveListarApenasEmpresasAtivas() {
-        EmpresaModel empresa = EmpresaModel.builder().id(1L).nome("Ativa").ativo(true).build();
+        EmpresaEntity empresa = EmpresaEntity.builder().id(1L).nome("Ativa").ativo(true).build();
         when(empresaRepository.findByAtivoTrue()).thenReturn(List.of(empresa));
 
         List<EmpresaResponseDTO> resultado = empresaService.listarTodas();

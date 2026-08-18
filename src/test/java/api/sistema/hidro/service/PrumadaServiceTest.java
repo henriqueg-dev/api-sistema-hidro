@@ -5,7 +5,7 @@ import api.sistema.hidro.dto.PrumadaRespostaDTO;
 import api.sistema.hidro.enums.CondicaoSanca;
 import api.sistema.hidro.enums.TipoPrumada;
 import api.sistema.hidro.exception.RecursoNaoEncontradoException;
-import api.sistema.hidro.model.PrumadaModel;
+import api.sistema.hidro.entity.PrumadaEntity;
 import api.sistema.hidro.repository.PrumadaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +36,7 @@ class PrumadaServiceTest {
         dto.setDesconector("50mm");
         dto.setCondicaoSanca(CondicaoSanca.SEM_SANCA);
 
-        PrumadaModel prumada = PrumadaModel.builder()
+        PrumadaEntity prumada = PrumadaEntity.builder()
                 .tipo(TipoPrumada.COZINHA)
                 .numPavimentos("ATE_9")
                 .desconector("50mm")
@@ -62,7 +62,7 @@ class PrumadaServiceTest {
         dto.setDesconector("50mm");
         dto.setCondicaoSanca(CondicaoSanca.SEM_SANCA);
 
-        PrumadaModel prumada = PrumadaModel.builder()
+        PrumadaEntity prumada = PrumadaEntity.builder()
                 .tipo(TipoPrumada.ARS)
                 .numPavimentos("ATE_5")
                 .desconector("50mm")

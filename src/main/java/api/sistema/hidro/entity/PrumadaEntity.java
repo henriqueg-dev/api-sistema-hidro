@@ -1,4 +1,4 @@
-package api.sistema.hidro.model;
+package api.sistema.hidro.entity;
 
 import api.sistema.hidro.enums.CondicaoSanca;
 import api.sistema.hidro.enums.FaixaPavimentos;
@@ -13,7 +13,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PrumadaModel {
+public class PrumadaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

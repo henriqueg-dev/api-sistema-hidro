@@ -4,8 +4,8 @@ import api.sistema.hidro.dto.EmpreendimentoRequestDTO;
 import api.sistema.hidro.dto.EmpreendimentoResponseDTO;
 import api.sistema.hidro.enums.TipoEmpreendimento;
 import api.sistema.hidro.exception.RecursoNaoEncontradoException;
-import api.sistema.hidro.model.EmpreendimentoModel;
-import api.sistema.hidro.model.EmpresaModel;
+import api.sistema.hidro.entity.EmpreendimentoEntity;
+import api.sistema.hidro.entity.EmpresaEntity;
 import api.sistema.hidro.repository.EmpreendimentoRepository;
 import api.sistema.hidro.repository.EmpresaRepository;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ class EmpreendimentoServiceTest {
 
     @Test
     void deveCriarEmpreendimentoVinculadoAEmpresaExistente() {
-        EmpresaModel empresa = EmpresaModel.builder().id(1L).nome("Construtora Alfa").build();
+        EmpresaEntity empresa = EmpresaEntity.builder().id(1L).nome("Construtora Alfa").build();
 
         EmpreendimentoRequestDTO dto = new EmpreendimentoRequestDTO();
         dto.setNome("Edifício Central");
@@ -56,7 +56,7 @@ class EmpreendimentoServiceTest {
         assertThat(resposta.getTipo()).isEqualTo(TipoEmpreendimento.PREDIO);
         assertThat(resposta.getEmpresaId()).isEqualTo(1L);
         assertThat(resposta.getEmpresaNome()).isEqualTo("Construtora Alfa");
-        verify(empreendimentoRepository).save(any(EmpreendimentoModel.class));
+        verify(empreendimentoRepository).save(any(EmpreendimentoEntity.class));
     }
 
     @Test
@@ -70,13 +70,13 @@ class EmpreendimentoServiceTest {
                 .isInstanceOf(RecursoNaoEncontradoException.class)
                 .hasMessage("Empresa não encontrada");
 
-        verify(empreendimentoRepository, never()).save(any(EmpreendimentoModel.class));
+        verify(empreendimentoRepository, never()).save(any(EmpreendimentoEntity.class));
     }
 
     @Test
     void deveListarEmpreendimentosAtivosPorEmpresa() {
-        EmpresaModel empresa = EmpresaModel.builder().id(1L).nome("Construtora Alfa").build();
-        EmpreendimentoModel empreendimento = EmpreendimentoModel.builder()
+        EmpresaEntity empresa = EmpresaEntity.builder().id(1L).nome("Construtora Alfa").build();
+        EmpreendimentoEntity empreendimento = EmpreendimentoEntity.builder()
                 .id(10L)
                 .nome("Edifício Central")
                 .tipo(TipoEmpreendimento.PREDIO)

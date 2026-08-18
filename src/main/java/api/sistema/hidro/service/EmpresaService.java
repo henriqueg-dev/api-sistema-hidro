@@ -3,7 +3,7 @@ package api.sistema.hidro.service;
 import api.sistema.hidro.dto.EmpresaRequestDTO;
 import api.sistema.hidro.dto.EmpresaResponseDTO;
 import api.sistema.hidro.exception.RecursoNaoEncontradoException;
-import api.sistema.hidro.model.EmpresaModel;
+import api.sistema.hidro.entity.EmpresaEntity;
 import api.sistema.hidro.repository.EmpresaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ public class EmpresaService {
 
     @Transactional
     public EmpresaResponseDTO criar(EmpresaRequestDTO dto) {
-        EmpresaModel empresa = EmpresaModel.builder()
+        EmpresaEntity empresa = EmpresaEntity.builder()
                 .nome(dto.getNome())
                 .build();
         empresaRepository.save(empresa);
@@ -40,18 +40,18 @@ public class EmpresaService {
 
     @Transactional
     public EmpresaResponseDTO atualizar(Long id, EmpresaRequestDTO dto) {
-        EmpresaModel empresa = buscarEntidade(id);
+        EmpresaEntity empresa = buscarEntidade(id);
         empresa.setNome(dto.getNome());
         empresaRepository.save(empresa);
         return toDTO(empresa);
     }
 
-    private EmpresaModel buscarEntidade(Long id) {
+    private EmpresaEntity buscarEntidade(Long id) {
         return empresaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Empresa não encontrada"));
     }
 
-    private EmpresaResponseDTO toDTO(EmpresaModel e) {
+    private EmpresaResponseDTO toDTO(EmpresaEntity e) {
         return new EmpresaResponseDTO(e.getId(), e.getNome(), e.getAtivo(), e.getCriadoEm());
     }
 }

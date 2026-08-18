@@ -3,7 +3,7 @@ package api.sistema.hidro.repository;
 import api.sistema.hidro.enums.CondicaoSanca;
 import api.sistema.hidro.enums.FaixaPavimentos;
 import api.sistema.hidro.enums.TipoPrumada;
-import api.sistema.hidro.model.PrumadaModel;
+import api.sistema.hidro.entity.PrumadaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PrumadaRepository extends JpaRepository<PrumadaModel, Long> {
+public interface PrumadaRepository extends JpaRepository<PrumadaEntity, Long> {
 
-    List<PrumadaModel> findByTipoAndAtivoTrue(TipoPrumada tipo);
+    List<PrumadaEntity> findByTipoAndAtivoTrue(TipoPrumada tipo);
 
-    Optional<PrumadaModel> findByTipoAndNumPavimentosAndDesconectorAndCondicaoSanca(
+    Optional<PrumadaEntity> findByTipoAndNumPavimentosAndDesconectorAndCondicaoSanca(
             TipoPrumada tipo,
             FaixaPavimentos numPavimentos,
             String desconector,

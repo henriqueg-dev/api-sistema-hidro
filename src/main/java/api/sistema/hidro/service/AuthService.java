@@ -3,7 +3,7 @@ package api.sistema.hidro.service;
 import api.sistema.hidro.dto.LoginRequest;
 import api.sistema.hidro.dto.LoginResponse;
 import api.sistema.hidro.exception.RecursoNaoEncontradoException;
-import api.sistema.hidro.model.UsuarioModel;
+import api.sistema.hidro.entity.UsuarioEntity;
 import api.sistema.hidro.repository.UsuarioRepository;
 import api.sistema.hidro.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +24,11 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(), request.getSenha()));
 
-        UsuarioModel usuarioModel = usuarioRepository.findByEmail(request.getEmail())
+        UsuarioEntity usuarioEntity = usuarioRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
 
-        String token = jwtUtil.gerarToken(usuarioModel.getEmail(), usuarioModel.getPerfil().name());
+        String token = jwtUtil.gerarToken(usuarioEntity.getEmail(), usuarioEntity.getPerfil().name());
 
-        return new LoginResponse(token, usuarioModel.getNome(), usuarioModel.getPerfil().name());
+        return new LoginResponse(token, usuarioEntity.getNome(), usuarioEntity.getPerfil().name());
     }
 }

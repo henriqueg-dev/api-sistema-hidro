@@ -4,7 +4,7 @@ import api.sistema.hidro.dto.LoginRequest;
 import api.sistema.hidro.dto.LoginResponse;
 import api.sistema.hidro.enums.PerfilUsuario;
 import api.sistema.hidro.exception.RecursoNaoEncontradoException;
-import api.sistema.hidro.model.UsuarioModel;
+import api.sistema.hidro.entity.UsuarioEntity;
 import api.sistema.hidro.repository.UsuarioRepository;
 import api.sistema.hidro.security.JwtUtil;
 import org.junit.jupiter.api.Test;
@@ -43,7 +43,7 @@ class AuthServiceTest {
                 .senha("senha123")
                 .build();
 
-        UsuarioModel usuario = UsuarioModel.builder()
+        UsuarioEntity usuario = UsuarioEntity.builder()
                 .nome("Administrador")
                 .email("admin@hidro.com")
                 .perfil(PerfilUsuario.ADMIN)
