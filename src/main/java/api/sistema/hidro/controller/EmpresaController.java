@@ -40,4 +40,10 @@ public class EmpresaController {
                                                         @RequestBody @Valid EmpresaRequestDTO dto) {
         return ResponseEntity.ok(empresaService.atualizar(id, dto));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+        empresaService.excluir(id);
+        return ResponseEntity.noContent().build();
+    }
 }

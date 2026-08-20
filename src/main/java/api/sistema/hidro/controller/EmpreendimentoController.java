@@ -36,4 +36,17 @@ public class EmpreendimentoController {
     public ResponseEntity<EmpreendimentoResponseDTO> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(empreendimentoService.buscarPorId(id));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<EmpreendimentoResponseDTO> atualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid EmpreendimentoRequestDTO dto) {
+        return ResponseEntity.ok(empreendimentoService.atualizar(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+        empreendimentoService.excluir(id);
+        return ResponseEntity.noContent().build();
+    }
 }

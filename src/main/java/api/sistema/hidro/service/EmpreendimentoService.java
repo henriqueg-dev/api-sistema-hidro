@@ -50,6 +50,27 @@ public class EmpreendimentoService {
         return toDTO(buscarEntidade(id));
     }
 
+    /** A empresa vinculada não muda: o {@code empresaId} do DTO é ignorado. */
+    @Transactional
+    public EmpreendimentoResponseDTO atualizar(Long id, EmpreendimentoRequestDTO dto) {
+        EmpreendimentoEntity empreendimento = buscarEntidade(id);
+        empreendimento.setNome(dto.getNome());
+        empreendimento.setTipo(dto.getTipo());
+        empreendimento.setNumPavimentos(dto.getNumPavimentos());
+        empreendimento.setEndereco(dto.getEndereco());
+        empreendimento.setConcessionaria(dto.getConcessionaria());
+        empreendimentoRepository.save(empreendimento);
+        return toDTO(empreendimento);
+    }
+
+    /** Exclusão lógica: o empreendimento deixa de aparecer nas listagens da empresa. */
+    @Transactional
+    public void excluir(Long id) {
+        EmpreendimentoEntity empreendimento = buscarEntidade(id);
+        empreendimento.setAtivo(false);
+        empreendimentoRepository.save(empreendimento);
+    }
+
     private EmpreendimentoEntity buscarEntidade(Long id) {
         return empreendimentoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Empreendimento não encontrado"));

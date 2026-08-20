@@ -3,7 +3,9 @@ package api.sistema.hidro.service;
 import api.sistema.hidro.dto.EmpresaRequestDTO;
 import api.sistema.hidro.dto.EmpresaResponseDTO;
 import api.sistema.hidro.exception.RecursoNaoEncontradoException;
+import api.sistema.hidro.entity.EmpreendimentoEntity;
 import api.sistema.hidro.entity.EmpresaEntity;
+import api.sistema.hidro.repository.EmpreendimentoRepository;
 import api.sistema.hidro.repository.EmpresaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import java.util.List;
 public class EmpresaService {
 
     private final EmpresaRepository empresaRepository;
+    private final EmpreendimentoRepository empreendimentoRepository;
 
     @Transactional
     public EmpresaResponseDTO criar(EmpresaRequestDTO dto) {
@@ -44,6 +47,19 @@ public class EmpresaService {
         empresa.setNome(dto.getNome());
         empresaRepository.save(empresa);
         return toDTO(empresa);
+    }
+
+    /** Exclusão lógica: a empresa e todos os seus empreendimentos deixam de ficar ativos. */
+    @Transactional
+    public void excluir(Long id) {
+        EmpresaEntity empresa = buscarEntidade(id);
+        empresa.setAtivo(false);
+        empresaRepository.save(empresa);
+
+        List<EmpreendimentoEntity> empreendimentos =
+                empreendimentoRepository.findByEmpresaIdAndAtivoTrue(id);
+        empreendimentos.forEach(empreendimento -> empreendimento.setAtivo(false));
+        empreendimentoRepository.saveAll(empreendimentos);
     }
 
     private EmpresaEntity buscarEntidade(Long id) {
