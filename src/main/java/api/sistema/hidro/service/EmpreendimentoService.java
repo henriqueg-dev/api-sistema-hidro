@@ -39,8 +39,8 @@ public class EmpreendimentoService {
         return toDTO(empreendimento);
     }
 
-    public List<EmpreendimentoResponseDTO> listarPorEmpresa(Long empresaId) {
-        return empreendimentoRepository.findByEmpresaIdAndAtivoTrue(empresaId)
+    public List<EmpreendimentoResponseDTO> listarPorEmpresa(Long empresaId, String busca) {
+        return empreendimentoRepository.buscarPorEmpresa(empresaId, busca == null ? "" : busca.trim())
                 .stream()
                 .map(this::toDTO)
                 .toList();

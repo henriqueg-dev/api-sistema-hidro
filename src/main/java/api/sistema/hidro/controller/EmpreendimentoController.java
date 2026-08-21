@@ -28,8 +28,9 @@ public class EmpreendimentoController {
 
     @GetMapping("/empresa/{empresaId}")
     public ResponseEntity<List<EmpreendimentoResponseDTO>> listarPorEmpresa(
-            @PathVariable Long empresaId) {
-        return ResponseEntity.ok(empreendimentoService.listarPorEmpresa(empresaId));
+            @PathVariable Long empresaId,
+            @RequestParam(required = false) String busca) {
+        return ResponseEntity.ok(empreendimentoService.listarPorEmpresa(empresaId, busca));
     }
 
     @GetMapping("/{id}")

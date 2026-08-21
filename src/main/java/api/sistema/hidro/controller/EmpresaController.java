@@ -26,8 +26,9 @@ public class EmpresaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EmpresaResponseDTO>> listarTodas() {
-        return ResponseEntity.ok(empresaService.listarTodas());
+    public ResponseEntity<List<EmpresaResponseDTO>> listarTodas(
+            @RequestParam(required = false) String busca) {
+        return ResponseEntity.ok(empresaService.listarTodas(busca));
     }
 
     @GetMapping("/{id}")

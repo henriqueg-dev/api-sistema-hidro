@@ -30,8 +30,8 @@ public class EmpresaService {
         return toDTO(empresa);
     }
 
-    public List<EmpresaResponseDTO> listarTodas() {
-        return empresaRepository.findByAtivoTrue()
+    public List<EmpresaResponseDTO> listarTodas(String busca) {
+        return empresaRepository.buscarPorNome(busca == null ? "" : busca.trim())
                 .stream()
                 .map(this::toDTO)
                 .toList();
