@@ -38,3 +38,14 @@ out/
 
 ### Graphify ###
 graphify-out/
+
+### Variáveis de ambiente (DB_URL, DB_PASSWORD, JWT_SECRET) ###
+.env
+.env.*
+
+### Claude Code (settings.json é compartilhado; o local é de cada máquina) ###
+.claude/settings.local.json
+
+### Logs ###
+*.log
+logs/
