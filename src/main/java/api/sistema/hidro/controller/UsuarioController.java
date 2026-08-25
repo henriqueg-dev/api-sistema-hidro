@@ -1,5 +1,6 @@
 package api.sistema.hidro.controller;
 
+import api.sistema.hidro.dto.AlterarSenhaDTO;
 import api.sistema.hidro.dto.UsuarioRequestDTO;
 import api.sistema.hidro.dto.UsuarioResponseDTO;
 import api.sistema.hidro.service.UsuarioService;
@@ -29,6 +30,12 @@ public class UsuarioController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UsuarioResponseDTO>> listarTodos() {
         return ResponseEntity.ok(usuarioService.listarTodos());
+    }
+
+    @PatchMapping("/me/senha")
+    public ResponseEntity<Void> alterarSenhaPropria(@RequestBody @Valid AlterarSenhaDTO dto) {
+        usuarioService.alterarSenhaPropria(dto.getSenhaAtual(), dto.getNovaSenha());
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/status")

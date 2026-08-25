@@ -63,6 +63,20 @@ public class UsuarioService {
         return toDTO(usuarioEntity);
     }
 
+    /** Só o próprio dono troca a senha: nem o administrador altera a senha de terceiros. */
+    @Transactional
+    public void alterarSenhaPropria(String senhaAtual, String novaSenha) {
+        UsuarioEntity usuarioEntity = usuarioRepository.findByEmail(emailAutenticado())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
+
+        if (!passwordEncoder.matches(senhaAtual, usuarioEntity.getSenha())) {
+            throw new RegraNegocioException("Senha atual incorreta");
+        }
+
+        usuarioEntity.setSenha(passwordEncoder.encode(novaSenha));
+        usuarioRepository.save(usuarioEntity);
+    }
+
     private void validarDesativacao(UsuarioEntity usuarioEntity) {
         if (!Boolean.TRUE.equals(usuarioEntity.getAtivo())) {
             return;
