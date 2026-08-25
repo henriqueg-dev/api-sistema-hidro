@@ -1,4 +1,4 @@
-package api.sistema.hidro.enums;
+package api.sistema.hidro.assistente.enums;
 
 /** Quem escreveu a mensagem dentro de uma conversa com o assistente. */
 public enum PapelMensagem {

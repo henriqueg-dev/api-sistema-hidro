@@ -1,4 +1,4 @@
-package api.sistema.hidro.dto;
+package api.sistema.hidro.assistente.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

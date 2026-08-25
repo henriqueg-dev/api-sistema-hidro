@@ -1,5 +1,6 @@
-package api.sistema.hidro.dto;
+package api.sistema.hidro.assistente.dto;
 
+import api.sistema.hidro.assistente.enums.PapelMensagem;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,11 +10,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ConversaResponseDTO {
+public class MensagemResponseDTO {
     private Long id;
-    private String titulo;
-    private Long empreendimentoId;
-    private String empreendimentoNome;
+    private PapelMensagem papel;
+    private String conteudo;
     private LocalDateTime criadoEm;
-    private LocalDateTime atualizadoEm;
 }

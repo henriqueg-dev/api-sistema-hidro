@@ -1,4 +1,4 @@
-package api.sistema.hidro.config;
+package api.sistema.hidro.assistente.service;
 
 import com.anthropic.client.AnthropicClient;
 import com.anthropic.client.okhttp.AnthropicOkHttpClient;

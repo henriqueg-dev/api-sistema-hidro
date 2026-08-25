@@ -1,6 +1,6 @@
-package api.sistema.hidro.entity;
+package api.sistema.hidro.assistente.entity;
 
-import api.sistema.hidro.enums.PapelMensagem;
+import api.sistema.hidro.assistente.enums.PapelMensagem;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

@@ -1,5 +1,7 @@
-package api.sistema.hidro.entity;
+package api.sistema.hidro.assistente.entity;
 
+import api.sistema.hidro.entity.EmpreendimentoEntity;
+import api.sistema.hidro.entity.UsuarioEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

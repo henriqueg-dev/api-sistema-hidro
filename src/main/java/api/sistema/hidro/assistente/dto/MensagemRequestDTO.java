@@ -1,4 +1,4 @@
-package api.sistema.hidro.dto;
+package api.sistema.hidro.assistente.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

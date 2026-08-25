@@ -1,10 +1,10 @@
-package api.sistema.hidro.controller;
+package api.sistema.hidro.assistente.controller;
 
-import api.sistema.hidro.dto.ConversaDetalheDTO;
-import api.sistema.hidro.dto.ConversaResponseDTO;
-import api.sistema.hidro.dto.MensagemRequestDTO;
-import api.sistema.hidro.dto.MensagemResponseDTO;
-import api.sistema.hidro.service.AssistenteService;
+import api.sistema.hidro.assistente.dto.ConversaDetalheDTO;
+import api.sistema.hidro.assistente.dto.ConversaResponseDTO;
+import api.sistema.hidro.assistente.dto.MensagemRequestDTO;
+import api.sistema.hidro.assistente.dto.MensagemResponseDTO;
+import api.sistema.hidro.assistente.service.AssistenteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

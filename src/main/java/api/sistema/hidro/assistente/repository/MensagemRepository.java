@@ -1,6 +1,6 @@
-package api.sistema.hidro.repository;
+package api.sistema.hidro.assistente.repository;
 
-import api.sistema.hidro.entity.MensagemEntity;
+import api.sistema.hidro.assistente.entity.MensagemEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
