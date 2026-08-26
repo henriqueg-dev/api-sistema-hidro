@@ -28,6 +28,14 @@ public class VazaoPredialService {
     /** Coeficiente da hora de maior consumo. */
     public static final double K2 = 1.5;
 
+    /**
+     * Divisão da reserva entre os dois reservatórios: 60% no inferior, que recebe a água da rua,
+     * e 40% no superior, que pesa sobre a laje. É prática consagrada de projeto, não imposição
+     * normativa — a NBR 5626 fixa a reserva mínima de 24 h de consumo, não como reparti-la.
+     */
+    public static final double FRACAO_INFERIOR = 0.6;
+    public static final double FRACAO_SUPERIOR = 0.4;
+
     private static final int SEGUNDOS_POR_DIA = 86400;
     private static final int SEGUNDOS_POR_HORA = 3600;
     private static final int LITROS_POR_M3 = 1000;
@@ -114,8 +122,12 @@ public class VazaoPredialService {
                 v.getCapacidadeEquivalenteDias(),
                 K1,
                 K2,
+                FRACAO_INFERIOR,
+                FRACAO_SUPERIOR,
                 v.getPopulacao(),
                 v.getVolumeCaixaM3(),
+                v.getVolumeCaixaM3() * FRACAO_INFERIOR,
+                v.getVolumeCaixaM3() * FRACAO_SUPERIOR,
                 v.getVazaoMediaLps(),
                 v.getVazaoMaximaDiariaLps(),
                 v.getVazaoMaximaHoraLps(),

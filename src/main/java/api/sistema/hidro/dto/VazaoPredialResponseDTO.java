@@ -20,9 +20,13 @@ public class VazaoPredialResponseDTO {
 
     private Double k1;
     private Double k2;
+    private Double fracaoInferior;
+    private Double fracaoSuperior;
 
     private Integer populacao;
     private Double volumeCaixaM3;
+    private Double volumeInferiorM3;
+    private Double volumeSuperiorM3;
     private Double vazaoMediaLps;
     private Double vazaoMaximaDiariaLps;
     private Double vazaoMaximaHoraLps;
