@@ -12,7 +12,6 @@ import api.sistema.hidro.entity.EmpreendimentoEntity;
 import api.sistema.hidro.entity.PiscinaEntity;
 import api.sistema.hidro.entity.TrechoPiscinaEntity;
 import api.sistema.hidro.enums.DiametroPiscina;
-import api.sistema.hidro.enums.SentidoTrecho;
 import api.sistema.hidro.enums.TipoConexao;
 import api.sistema.hidro.enums.TipoUsoPiscina;
 import api.sistema.hidro.exception.RecursoNaoEncontradoException;
@@ -33,34 +32,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PiscinaService {
-
-    /** Constante da fórmula de Fair-Whipple-Hsiao para PVC. */
-    private static final double FWH_CONSTANTE = 8.69e6;
-
-    /** Ajuste do memorial de origem sobre a constante, mantido por fidelidade. */
-    private static final double FWH_FATOR = 0.11;
-
-    private static final double FWH_EXPOENTE_VAZAO = 1.75;
-    private static final double FWH_EXPOENTE_DIAMETRO = 4.75;
-
-    /** Vazão máxima que um bocal de retorno comporta (m³/h). */
-    private static final double VAZAO_POR_BOCAL_M3H = 5.0;
-
-    /** Área de superfície por bocal de retorno (m²), para a água circular por igual. */
-    private static final int AREA_POR_BOCAL_M2 = 50;
-
-    /** Área servida por ralo de fundo (m²). */
-    private static final int AREA_POR_RALO_M2 = 50;
-
-    private static final int AREA_POR_SKIMMER_PADRAO_M2 = 50;
-
-    /** NBR 10339: no mínimo dois ralos interligados, por segurança. */
-    private static final int MIN_RALOS = 2;
-
-    /** Sem ralo de fundo, a sucção só por skimmer exige no mínimo dois. */
-    private static final int MIN_SKIMMERS_SEM_RALO = 2;
-
-    private static final int MIN_BOCAIS_RETORNO = 2;
 
     private final PiscinaRepository piscinaRepository;
     private final TrechoPiscinaRepository trechoRepository;
@@ -119,21 +90,19 @@ public class PiscinaService {
     private void aplicarCalculo(PiscinaEntity piscina, PiscinaRequestDTO dto) {
         int areaPorSkimmer = dto.getAreaPorSkimmerM2() != null
                 ? dto.getAreaPorSkimmerM2()
-                : AREA_POR_SKIMMER_PADRAO_M2;
+                : CalculoPiscina.AREA_POR_SKIMMER_PADRAO_M2;
 
-        double area = dto.getLarguraM() * dto.getComprimentoM();
-        double volume = area * dto.getProfundidadeM();
-        double vazaoProjeto = volume / dto.getTempoFiltracaoH();
-
-        if (dto.getVazaoBombaM3h() < vazaoProjeto) {
+        CalculoPiscina.Dimensionamento calculo;
+        try {
+            calculo = CalculoPiscina.dimensionar(
+                    dto.getLarguraM(), dto.getComprimentoM(), dto.getProfundidadeM(),
+                    dto.getTempoFiltracaoH(), dto.getVazaoBombaM3h(), areaPorSkimmer);
+        } catch (IllegalArgumentException ex) {
             throw new RegraNegocioException(String.format(
-                    "A vazão da bomba (%.2f m³/h) é menor que a vazão de projeto (%.2f m³/h). "
+                    "A vazão da bomba (%.2f m³/h) é menor que a vazão de projeto. "
                             + "Escolha uma bomba de maior vazão ou aumente o tempo de filtração.",
-                    dto.getVazaoBombaM3h(), vazaoProjeto));
+                    dto.getVazaoBombaM3h()));
         }
-
-        DiametroPiscina recalque = DiametroPiscina.paraRecalque(dto.getVazaoBombaM3h());
-        DiametroPiscina succao = DiametroPiscina.paraSuccao(dto.getVazaoBombaM3h());
 
         piscina.setNome(dto.getNome());
         piscina.setTipoUso(dto.getTipoUso());
@@ -146,39 +115,26 @@ public class PiscinaService {
         piscina.setAreaPorSkimmerM2(areaPorSkimmer);
         piscina.setNumAspiradores(dto.getNumAspiradores());
 
-        piscina.setAreaM2(area);
-        piscina.setVolumeM3(volume);
-        piscina.setVazaoProjetoM3h(vazaoProjeto);
+        piscina.setAreaM2(calculo.areaM2());
+        piscina.setVolumeM3(calculo.volumeM3());
+        piscina.setVazaoProjetoM3h(calculo.vazaoProjetoM3h());
 
-        piscina.setDnRecalqueMm(recalque.getDn());
-        piscina.setDnSuccaoMm(succao.getDn());
-        piscina.setVelocidadeRecalqueMs(recalque.velocidadeMs(dto.getVazaoBombaM3h()));
-        piscina.setVelocidadeSuccaoMs(succao.velocidadeMs(dto.getVazaoBombaM3h()));
+        piscina.setDnRecalqueMm(calculo.recalque().getDn());
+        piscina.setDnSuccaoMm(calculo.succao().getDn());
+        piscina.setVelocidadeRecalqueMs(calculo.velocidadeRecalqueMs());
+        piscina.setVelocidadeSuccaoMs(calculo.velocidadeSuccaoMs());
 
-        // Vale o critério que exigir mais bocais.
-        double bocaisPorVazao = dto.getVazaoBombaM3h() / VAZAO_POR_BOCAL_M3H;
-        double bocaisPorArea = area / AREA_POR_BOCAL_M2;
-        double bocaisCalculado = Math.max(bocaisPorVazao, bocaisPorArea);
+        piscina.setNumBocaisRetornoCalculado(calculo.bocaisCalculado());
+        piscina.setNumSkimmersCalculado(calculo.skimmersCalculado());
+        piscina.setNumRalosCalculado(calculo.ralosCalculado());
 
-        double skimmersCalculado = area / areaPorSkimmer;
-        double ralosCalculado = area / AREA_POR_RALO_M2;
-
-        piscina.setNumBocaisRetornoCalculado(bocaisCalculado);
-        piscina.setNumSkimmersCalculado(skimmersCalculado);
-        piscina.setNumRalosCalculado(ralosCalculado);
-
-        piscina.setNumBocaisRetornoAdotado(adotar(
-                dto.getNumBocaisRetornoAdotado(), bocaisCalculado, MIN_BOCAIS_RETORNO));
-        piscina.setNumSkimmersAdotado(adotar(
-                dto.getNumSkimmersAdotado(), skimmersCalculado, 0));
-        piscina.setNumRalosAdotado(adotar(
-                dto.getNumRalosAdotado(), ralosCalculado, MIN_RALOS));
-    }
-
-    /** Arredonda para cima e respeita o mínimo, salvo quando o projetista fixa o valor. */
-    private int adotar(Integer override, double calculado, int minimo) {
-        if (override != null) return override;
-        return Math.max(minimo, (int) Math.ceil(calculado));
+        piscina.setNumBocaisRetornoAdotado(CalculoPiscina.adotar(
+                dto.getNumBocaisRetornoAdotado(), calculo.bocaisCalculado(),
+                CalculoPiscina.MIN_BOCAIS_RETORNO));
+        piscina.setNumSkimmersAdotado(CalculoPiscina.adotar(
+                dto.getNumSkimmersAdotado(), calculo.skimmersCalculado(), 0));
+        piscina.setNumRalosAdotado(CalculoPiscina.adotar(
+                dto.getNumRalosAdotado(), calculo.ralosCalculado(), CalculoPiscina.MIN_RALOS));
     }
 
     // ------------------------------------------------------------------
@@ -204,13 +160,11 @@ public class PiscinaService {
 
             double lEquivalente = lEquivalenteAdicional
                     + somarConexoes(dto.getConexoes(), dto.getDnMm());
-            double lTotal = lEquivalente + dto.getLRealM();
 
-            double vazaoLs = dto.getVazaoM3h() / 3.6;
-            double perdaUnitaria = perdaUnitaria(vazaoLs, diametro.getDiametroInternoMm());
-            double hf = perdaUnitaria * lTotal;
-            double pressaoJusante = dto.getSentido()
-                    .pressaoJusante(pressaoMontante, dto.getDesnivelM(), hf);
+            CalculoPiscina.TrechoCalculado calculo = CalculoPiscina.calcularTrecho(
+                    new CalculoPiscina.Trecho(dto.getVazaoM3h(), diametro, lEquivalente,
+                            dto.getLRealM(), dto.getDesnivelM(), dto.getSentido()),
+                    pressaoMontante);
 
             TrechoPiscinaEntity trecho = TrechoPiscinaEntity.builder()
                     .piscina(piscina)
@@ -223,36 +177,25 @@ public class PiscinaService {
                     .lRealM(dto.getLRealM())
                     .lEquivalenteAdicionalM(lEquivalenteAdicional)
                     .diametroInternoMm(diametro.getDiametroInternoMm())
-                    .vazaoLs(vazaoLs)
-                    .velocidadeMs(diametro.velocidadeMs(dto.getVazaoM3h()))
-                    .perdaUnitariaMM(perdaUnitaria)
+                    .vazaoLs(calculo.vazaoLs())
+                    .velocidadeMs(calculo.velocidadeMs())
+                    .perdaUnitariaMM(calculo.perdaUnitariaMM())
                     .lEquivalenteM(lEquivalente)
-                    .lTotalM(lTotal)
-                    .hfM(hf)
-                    .pressaoMontanteMca(pressaoMontante)
-                    .pressaoJusanteMca(pressaoJusante)
+                    .lTotalM(calculo.lTotalM())
+                    .hfM(calculo.hfM())
+                    .pressaoMontanteMca(calculo.pressaoMontanteMca())
+                    .pressaoJusanteMca(calculo.pressaoJusanteMca())
                     .build();
 
             trechoRepository.save(trecho);
             salvarConexoes(trecho, dto.getConexoes());
 
-            pressaoMontante = pressaoJusante;
+            pressaoMontante = calculo.pressaoJusanteMca();
         }
 
         // A pressão residual é a que sobra no bocal mais desfavorável.
         piscina.setPressaoResidualMca(pressaoMontante);
         piscinaRepository.save(piscina);
-    }
-
-    /**
-     * Fair-Whipple-Hsiao para PVC: J = 8,69e6 x Q^1,75 x (1 / D^4,75) x 0,11,
-     * com Q em L/s e D interno em mm.
-     */
-    private double perdaUnitaria(double vazaoLs, double diametroInternoMm) {
-        return FWH_CONSTANTE
-                * Math.pow(vazaoLs, FWH_EXPOENTE_VAZAO)
-                / Math.pow(diametroInternoMm, FWH_EXPOENTE_DIAMETRO)
-                * FWH_FATOR;
     }
 
     private double somarConexoes(List<ConexaoTrechoRequestDTO> conexoes, int dn) {
@@ -322,13 +265,14 @@ public class PiscinaService {
                     piscina.getDnRecalqueMm()));
         }
 
-        if (piscina.getNumRalosAdotado() > 0 && piscina.getNumRalosAdotado() < MIN_RALOS) {
+        if (piscina.getNumRalosAdotado() > 0
+                && piscina.getNumRalosAdotado() < CalculoPiscina.MIN_RALOS) {
             alertas.add("A NBR 10339 exige no mínimo 2 ralos de fundo interligados, "
                     + "afastados pelo menos 1,5 m entre si, com grelha antiaprisionamento.");
         }
 
         if (piscina.getNumRalosAdotado() == 0
-                && piscina.getNumSkimmersAdotado() < MIN_SKIMMERS_SEM_RALO) {
+                && piscina.getNumSkimmersAdotado() < CalculoPiscina.MIN_SKIMMERS_SEM_RALO) {
             alertas.add("Sem ralo de fundo, a sucção fica só pelos skimmers e a NBR 10339 "
                     + "exige no mínimo 2, para não haver risco de aprisionamento.");
         }
@@ -393,8 +337,8 @@ public class PiscinaService {
                 piscina.getVelocidadeRecalqueMs(),
                 piscina.getVelocidadeSuccaoMs(),
                 piscina.getNumBocaisRetornoCalculado(),
-                piscina.getVazaoBombaM3h() / VAZAO_POR_BOCAL_M3H,
-                piscina.getAreaM2() / AREA_POR_BOCAL_M2,
+                piscina.getVazaoBombaM3h() / CalculoPiscina.VAZAO_POR_BOCAL_M3H,
+                piscina.getAreaM2() / CalculoPiscina.AREA_POR_BOCAL_M2,
                 piscina.getNumBocaisRetornoAdotado(),
                 piscina.getNumSkimmersCalculado(),
                 piscina.getNumSkimmersAdotado(),
