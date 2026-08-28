@@ -249,11 +249,14 @@ Diâmetros por faixa de `Qb`, em PVC soldável classe 15:
 Dispositivos (o projetista pode sobrescrever qualquer um):
 
 ```text
-bocais de retorno = arredonda para cima(Qb / 5),  mínimo 2
+bocais de retorno = arredonda para cima(maior entre Qb / 5 e A / 50), mínimo 2
 skimmers          = arredonda para cima(A / As),  As padrão 50 m²
 ralos de fundo    = arredonda para cima(A / 50),  mínimo 2
 aspiradores       = definido no projeto (1 a cada 10 m de raio de alcance)
 ```
+
+No bocal de retorno, `Qb / 5` é o limite de vazão do dispositivo e `A / 50` é a
+distribuição na superfície exigida pela NBR 10339; vale o que pedir mais bocais.
 
 **Parte 2 — perda de carga trecho a trecho.** Cada trecho tem sentido (sucção ou
 recalque), vazão, DN, desnível, comprimento real e a lista de conexões.

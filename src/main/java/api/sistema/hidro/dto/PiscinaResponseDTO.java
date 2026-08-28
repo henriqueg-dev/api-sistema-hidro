@@ -35,7 +35,10 @@ public class PiscinaResponseDTO {
     private Double velocidadeRecalqueMs;
     private Double velocidadeSuccaoMs;
 
+    /** Maior entre os dois critérios seguintes: Qb/5 e A/50. */
     private Double numBocaisRetornoCalculado;
+    private Double numBocaisPorVazao;
+    private Double numBocaisPorArea;
     private Integer numBocaisRetornoAdotado;
     private Double numSkimmersCalculado;
     private Integer numSkimmersAdotado;

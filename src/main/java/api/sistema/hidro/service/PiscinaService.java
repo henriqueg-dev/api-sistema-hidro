@@ -43,8 +43,11 @@ public class PiscinaService {
     private static final double FWH_EXPOENTE_VAZAO = 1.75;
     private static final double FWH_EXPOENTE_DIAMETRO = 4.75;
 
-    /** Vazão atendida por bocal de retorno (m³/h). */
+    /** Vazão máxima que um bocal de retorno comporta (m³/h). */
     private static final double VAZAO_POR_BOCAL_M3H = 5.0;
+
+    /** Área de superfície por bocal de retorno (m²), para a água circular por igual. */
+    private static final int AREA_POR_BOCAL_M2 = 50;
 
     /** Área servida por ralo de fundo (m²). */
     private static final int AREA_POR_RALO_M2 = 50;
@@ -152,7 +155,11 @@ public class PiscinaService {
         piscina.setVelocidadeRecalqueMs(recalque.velocidadeMs(dto.getVazaoBombaM3h()));
         piscina.setVelocidadeSuccaoMs(succao.velocidadeMs(dto.getVazaoBombaM3h()));
 
-        double bocaisCalculado = dto.getVazaoBombaM3h() / VAZAO_POR_BOCAL_M3H;
+        // Vale o critério que exigir mais bocais.
+        double bocaisPorVazao = dto.getVazaoBombaM3h() / VAZAO_POR_BOCAL_M3H;
+        double bocaisPorArea = area / AREA_POR_BOCAL_M2;
+        double bocaisCalculado = Math.max(bocaisPorVazao, bocaisPorArea);
+
         double skimmersCalculado = area / areaPorSkimmer;
         double ralosCalculado = area / AREA_POR_RALO_M2;
 
@@ -386,6 +393,8 @@ public class PiscinaService {
                 piscina.getVelocidadeRecalqueMs(),
                 piscina.getVelocidadeSuccaoMs(),
                 piscina.getNumBocaisRetornoCalculado(),
+                piscina.getVazaoBombaM3h() / VAZAO_POR_BOCAL_M3H,
+                piscina.getAreaM2() / AREA_POR_BOCAL_M2,
                 piscina.getNumBocaisRetornoAdotado(),
                 piscina.getNumSkimmersCalculado(),
                 piscina.getNumSkimmersAdotado(),
