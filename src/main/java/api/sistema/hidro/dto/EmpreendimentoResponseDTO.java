@@ -17,8 +17,8 @@ public class EmpreendimentoResponseDTO {
     private Integer numPavimentos;
     private String endereco;
     private String concessionaria;
-    private Long empresaId;
-    private String empresaNome;
+    private Long clienteId;
+    private String clienteNome;
     private Boolean ativo;
     private LocalDateTime criadoEm;
 }

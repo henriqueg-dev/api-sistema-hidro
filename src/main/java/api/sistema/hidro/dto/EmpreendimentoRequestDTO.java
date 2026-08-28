@@ -26,6 +26,6 @@ public class EmpreendimentoRequestDTO {
     @NotBlank(message = "Concessionária é obrigatória")
     private String concessionaria;
 
-    @NotNull(message = "Empresa é obrigatória")
-    private Long empresaId;
+    @NotNull(message = "Cliente é obrigatório")
+    private Long clienteId;
 }

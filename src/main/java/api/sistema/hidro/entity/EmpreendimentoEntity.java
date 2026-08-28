@@ -37,8 +37,8 @@ public class EmpreendimentoEntity {
     private String concessionaria;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "empresa_id", nullable = false)
-    private EmpresaEntity empresa;
+    @JoinColumn(name = "cliente_id", nullable = false)
+    private ClienteEntity cliente;
 
     @Builder.Default
     @Column(nullable = false)

@@ -4,9 +4,9 @@ import api.sistema.hidro.dto.EmpreendimentoRequestDTO;
 import api.sistema.hidro.dto.EmpreendimentoResponseDTO;
 import api.sistema.hidro.exception.RecursoNaoEncontradoException;
 import api.sistema.hidro.entity.EmpreendimentoEntity;
-import api.sistema.hidro.entity.EmpresaEntity;
+import api.sistema.hidro.entity.ClienteEntity;
 import api.sistema.hidro.repository.EmpreendimentoRepository;
-import api.sistema.hidro.repository.EmpresaRepository;
+import api.sistema.hidro.repository.ClienteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,12 +19,12 @@ import java.util.List;
 public class EmpreendimentoService {
 
     private final EmpreendimentoRepository empreendimentoRepository;
-    private final EmpresaRepository empresaRepository;
+    private final ClienteRepository clienteRepository;
 
     @Transactional
     public EmpreendimentoResponseDTO criar(EmpreendimentoRequestDTO dto) {
-        EmpresaEntity empresa = empresaRepository.findById(dto.getEmpresaId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Empresa não encontrada"));
+        ClienteEntity cliente = clienteRepository.findById(dto.getClienteId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente não encontrado"));
 
         EmpreendimentoEntity empreendimento = EmpreendimentoEntity.builder()
                 .nome(dto.getNome())
@@ -32,15 +32,15 @@ public class EmpreendimentoService {
                 .numPavimentos(dto.getNumPavimentos())
                 .endereco(dto.getEndereco())
                 .concessionaria(dto.getConcessionaria())
-                .empresa(empresa)
+                .cliente(cliente)
                 .build();
 
         empreendimentoRepository.save(empreendimento);
         return toDTO(empreendimento);
     }
 
-    public List<EmpreendimentoResponseDTO> listarPorEmpresa(Long empresaId, String busca) {
-        return empreendimentoRepository.buscarPorEmpresa(empresaId, busca == null ? "" : busca.trim())
+    public List<EmpreendimentoResponseDTO> listarPorCliente(Long clienteId, String busca) {
+        return empreendimentoRepository.buscarPorCliente(clienteId, busca == null ? "" : busca.trim())
                 .stream()
                 .map(this::toDTO)
                 .toList();
@@ -50,7 +50,7 @@ public class EmpreendimentoService {
         return toDTO(buscarEntidade(id));
     }
 
-    /** A empresa vinculada não muda: o {@code empresaId} do DTO é ignorado. */
+    /** A cliente vinculada não muda: o {@code clienteId} do DTO é ignorado. */
     @Transactional
     public EmpreendimentoResponseDTO atualizar(Long id, EmpreendimentoRequestDTO dto) {
         EmpreendimentoEntity empreendimento = buscarEntidade(id);
@@ -63,7 +63,7 @@ public class EmpreendimentoService {
         return toDTO(empreendimento);
     }
 
-    /** Exclusão lógica: o empreendimento deixa de aparecer nas listagens da empresa. */
+    /** Exclusão lógica: o empreendimento deixa de aparecer nas listagens da cliente. */
     @Transactional
     public void excluir(Long id) {
         EmpreendimentoEntity empreendimento = buscarEntidade(id);
@@ -80,7 +80,7 @@ public class EmpreendimentoService {
         return new EmpreendimentoResponseDTO(
                 e.getId(), e.getNome(), e.getTipo(),
                 e.getNumPavimentos(), e.getEndereco(),
-                e.getConcessionaria(), e.getEmpresa().getId(),
-                e.getEmpresa().getNome(), e.getAtivo(), e.getCriadoEm());
+                e.getConcessionaria(), e.getCliente().getId(),
+                e.getCliente().getNome(), e.getAtivo(), e.getCriadoEm());
     }
 }

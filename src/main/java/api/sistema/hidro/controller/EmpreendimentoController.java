@@ -26,11 +26,11 @@ public class EmpreendimentoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(empreendimentoService.criar(dto));
     }
 
-    @GetMapping("/empresa/{empresaId}")
-    public ResponseEntity<List<EmpreendimentoResponseDTO>> listarPorEmpresa(
-            @PathVariable Long empresaId,
+    @GetMapping("/cliente/{clienteId}")
+    public ResponseEntity<List<EmpreendimentoResponseDTO>> listarPorCliente(
+            @PathVariable Long clienteId,
             @RequestParam(required = false) String busca) {
-        return ResponseEntity.ok(empreendimentoService.listarPorEmpresa(empresaId, busca));
+        return ResponseEntity.ok(empreendimentoService.listarPorCliente(clienteId, busca));
     }
 
     @GetMapping("/{id}")

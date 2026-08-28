@@ -11,15 +11,15 @@ import java.util.List;
 @Repository
 public interface EmpreendimentoRepository extends JpaRepository<EmpreendimentoEntity, Long> {
 
-    List<EmpreendimentoEntity> findByEmpresaIdAndAtivoTrue(Long empresaId);
+    List<EmpreendimentoEntity> findByClienteIdAndAtivoTrue(Long clienteId);
 
     @Query("""
             select e from EmpreendimentoEntity e
-            where e.empresa.id = :empresaId
+            where e.cliente.id = :clienteId
               and e.ativo = true
               and lower(e.nome) like lower(concat('%', :busca, '%'))
             order by e.nome
             """)
-    List<EmpreendimentoEntity> buscarPorEmpresa(@Param("empresaId") Long empresaId,
+    List<EmpreendimentoEntity> buscarPorCliente(@Param("clienteId") Long clienteId,
                                                 @Param("busca") String busca);
 }

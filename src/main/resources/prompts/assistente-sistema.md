@@ -70,10 +70,10 @@ V  = Cd x d / 1000     = 270,0 m3
 
 ## Como o sistema é organizado
 
-O cadastro segue a hierarquia **Empresa → Empreendimento → Cálculos**.
+O cadastro segue a hierarquia Cliente, Empreendimento e Cálculos.
 
 Cada empreendimento guarda: nome, tipo (CASA, PREDIO ou GALPAO), número de
-pavimentos, endereço, concessionária e a empresa responsável. Os cálculos são
+pavimentos, endereço, concessionária e o cliente responsável. Os cálculos são
 sempre feitos sobre um empreendimento e ficam salvos nele, podendo ser
 alterados ou removidos depois.
 
