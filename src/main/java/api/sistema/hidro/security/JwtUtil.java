@@ -49,6 +49,12 @@ public class JwtUtil {
         }
     }
 
+    // Passou da metade da validade: expira por inatividade, não por tempo fixo.
+    public boolean precisaRenovar(String token) {
+        Date expiraEm = getClaims(token).getExpiration();
+        return expiraEm.getTime() - System.currentTimeMillis() < expiration / 2;
+    }
+
     private Claims getClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())

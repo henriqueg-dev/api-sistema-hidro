@@ -2,6 +2,7 @@ package api.sistema.hidro.config;
 
 import api.sistema.hidro.exception.GlobalExceptionHandler;
 import api.sistema.hidro.security.JwtFiltro;
+import api.sistema.hidro.security.RateLimitFiltro;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +35,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtFiltro jwtFiltro;
+    private final RateLimitFiltro rateLimitFiltro;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
@@ -51,7 +53,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated())
-                .addFilterBefore(jwtFiltro, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(rateLimitFiltro, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(jwtFiltro, RateLimitFiltro.class);
 
         return http.build();
     }
@@ -67,6 +70,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(origensPermitidas);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(List.of(JwtFiltro.CABECALHO_RENOVACAO));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

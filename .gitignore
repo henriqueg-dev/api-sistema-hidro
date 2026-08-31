@@ -49,3 +49,8 @@ graphify-out/
 ### Logs ###
 *.log
 logs/
+
+### Skills instaladas por plugin (por máquina, não fazem parte do projeto) ###
+.agents/
+.claude/skills/
+skills-lock.json

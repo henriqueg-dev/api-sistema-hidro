@@ -20,6 +20,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtFiltro extends OncePerRequestFilter {
 
+    public static final String CABECALHO_RENOVACAO = "X-Token-Renovado";
+
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
 
@@ -40,9 +42,21 @@ public class JwtFiltro extends OncePerRequestFilter {
 
         if (jwtUtil.tokenValido(token)) {
             autenticar(request, jwtUtil.extrairEmail(token));
+            renovarSeNecessario(response, token);
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private void renovarSeNecessario(HttpServletResponse response, String token) {
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            return;
+        }
+
+        if (jwtUtil.precisaRenovar(token)) {
+            response.setHeader(CABECALHO_RENOVACAO,
+                    jwtUtil.gerarToken(jwtUtil.extrairEmail(token), jwtUtil.extrairPerfil(token)));
+        }
     }
 
     private void autenticar(HttpServletRequest request, String email) {
