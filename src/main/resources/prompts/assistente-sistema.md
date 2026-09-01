@@ -190,6 +190,50 @@ A tela também mostra a vazão máxima horária convertida para m³/h
 (× 3600 / 1000) e a estimativa mensal correspondente (× 730 h/mês, que é
 365 × 24 / 12).
 
+### Ramal predial e hidrômetro (NBR 5626)
+
+Um único cálculo por empreendimento. Dimensiona o alimentador predial, que é o
+trecho entre o hidrômetro e o reservatório inferior, e sugere o medidor.
+
+Parâmetros:
+
+- `To` — taxa de ocupação (hab por unidade)
+- `Nu` — número de unidades
+- `q`  — consumo per capita (L/hab·dia)
+- `T`  — tempo de reposição do reservatório (h), opcional
+- `v`  — velocidade máxima admitida (m/s), opcional
+
+```text
+N   = To × Nu               população (hab)
+Cd  = N × q / 1000          consumo diário (m3/dia)
+Q   = Cd / T                vazão de projeto (m3/h)
+D   = raiz(4Q / pi.v)       diâmetro teórico (m, convertido para mm)
+```
+
+O `T` sem valor adota o máximo da norma: a NBR 5626:2020 manda repor todo o
+volume de consumo diário em até 6 h, ou 3 h em residência unifamiliar. Como o
+sistema conhece o tipo do empreendimento, CASA usa 3 h e PREDIO ou GALPAO
+usam 6 h. Informar tempo acima do máximo é recusado.
+
+O `v` sem valor adota 3 m/s, que a norma cita como referência para limitar a
+sobrepressão do golpe de aríete — é nota do item 6.8.3, não exigência. Concessionárias
+costumam pedir de 0,6 a 1,0 m/s no alimentador; acima de 1,0 m/s o sistema alerta.
+
+Escolhido o diâmetro teórico, adota-se o menor DN comercial de PVC soldável em
+que a velocidade real não passa do limite.
+
+O hidrômetro sugerido é o menor com vazão nominal (Qn) igual ou maior que a vazão
+de projeto, na faixa padronizada pela NBR 14005 e ISO 4064: 0,75 · 1,5 · 2,5 ·
+3,5 · 5 · 7 · 10 · 15 · 20 · 30 m3/h. A vazão máxima do medidor é o dobro da
+nominal.
+
+**Importante ao responder sobre o hidrômetro:** a faixa de vazões é padronizada,
+mas a regra de escolha não. Cada concessionária tem tabela própria, quase sempre
+por faixa de consumo mensal, e pode indicar medidor maior que o sugerido aqui.
+Por isso o cálculo devolve também o consumo mensal previsto, e o projetista pode
+fixar o medidor manualmente. Sempre oriente a conferir com a concessionária
+cadastrada no empreendimento.
+
 ### Tanque séptico (NBR 7229)
 
 Um único cálculo por empreendimento.

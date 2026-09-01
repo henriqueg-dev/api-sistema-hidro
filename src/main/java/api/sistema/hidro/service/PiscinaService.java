@@ -135,6 +135,10 @@ public class PiscinaService {
                 dto.getNumSkimmersAdotado(), calculo.skimmersCalculado(), 0));
         piscina.setNumRalosAdotado(CalculoPiscina.adotar(
                 dto.getNumRalosAdotado(), calculo.ralosCalculado(), CalculoPiscina.MIN_RALOS));
+
+        piscina.setNumBocaisRetornoInformado(dto.getNumBocaisRetornoAdotado());
+        piscina.setNumSkimmersInformado(dto.getNumSkimmersAdotado());
+        piscina.setNumRalosInformado(dto.getNumRalosAdotado());
     }
 
     // ------------------------------------------------------------------
@@ -340,10 +344,13 @@ public class PiscinaService {
                 piscina.getVazaoBombaM3h() / CalculoPiscina.VAZAO_POR_BOCAL_M3H,
                 piscina.getAreaM2() / CalculoPiscina.AREA_POR_BOCAL_M2,
                 piscina.getNumBocaisRetornoAdotado(),
+                piscina.getNumBocaisRetornoInformado(),
                 piscina.getNumSkimmersCalculado(),
                 piscina.getNumSkimmersAdotado(),
+                piscina.getNumSkimmersInformado(),
                 piscina.getNumRalosCalculado(),
                 piscina.getNumRalosAdotado(),
+                piscina.getNumRalosInformado(),
                 piscina.getNumAspiradores(),
                 piscina.getPressaoResidualMca(),
                 trechos.stream().map(this::toTrechoDTO).toList(),

@@ -3,10 +3,12 @@ package api.sistema.hidro.assistente.service;
 import api.sistema.hidro.entity.CaixaGorduraEntity;
 import api.sistema.hidro.entity.EmpreendimentoEntity;
 import api.sistema.hidro.entity.PiscinaEntity;
+import api.sistema.hidro.entity.RamalPredialEntity;
 import api.sistema.hidro.entity.TanqueSepticoEntity;
 import api.sistema.hidro.entity.VazaoPredialEntity;
 import api.sistema.hidro.repository.CaixaGorduraRepository;
 import api.sistema.hidro.repository.PiscinaRepository;
+import api.sistema.hidro.repository.RamalPredialRepository;
 import api.sistema.hidro.repository.TanqueSepticoRepository;
 import api.sistema.hidro.repository.VazaoPredialRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class ContextoEmpreendimento {
 
     private final CaixaGorduraRepository caixaGorduraRepository;
     private final VazaoPredialRepository vazaoPredialRepository;
+    private final RamalPredialRepository ramalPredialRepository;
     private final TanqueSepticoRepository tanqueSepticoRepository;
     private final PiscinaRepository piscinaRepository;
 
@@ -35,6 +38,7 @@ public class ContextoEmpreendimento {
 
         boolean temCalculo = caixasGordura(contexto, id);
         temCalculo |= vazoesPrediais(contexto, id);
+        temCalculo |= ramaisPrediais(contexto, id);
         temCalculo |= tanquesSepticos(contexto, id);
         temCalculo |= piscinas(contexto, id);
 
@@ -87,6 +91,30 @@ public class ContextoEmpreendimento {
                     .append("vazão média ").append(vazao.getVazaoMediaLps()).append(" L/s, ")
                     .append("máxima diária ").append(vazao.getVazaoMaximaDiariaLps()).append(" L/s, ")
                     .append("máxima horária ").append(vazao.getVazaoMaximaHoraLps()).append(" L/s\n");
+        }
+        return true;
+    }
+
+    private boolean ramaisPrediais(StringBuilder contexto, Long empreendimentoId) {
+        List<RamalPredialEntity> ramais =
+                ramalPredialRepository.findByEmpreendimentoIdOrderByCriadoEmAsc(empreendimentoId);
+
+        if (ramais.isEmpty()) return false;
+
+        contexto.append("\n## Ramal predial e hidrômetro (NBR 5626)\n\n");
+        for (RamalPredialEntity ramal : ramais) {
+            contexto.append("- População ").append(ramal.getPopulacao())
+                    .append(", consumo per capita ").append(ramal.getConsumoPerCapita())
+                    .append(" L/hab.dia, consumo diário ").append(ramal.getConsumoDiarioM3())
+                    .append(" m3 (").append(ramal.getConsumoMensalM3()).append(" m3/mes), ")
+                    .append("reposição em ").append(ramal.getTempoReposicaoH()).append(" h, ")
+                    .append("vazão de projeto ").append(ramal.getVazaoProjetoM3h()).append(" m3/h (")
+                    .append(ramal.getVazaoProjetoLs()).append(" L/s), ")
+                    .append("diâmetro teórico ").append(ramal.getDiametroTeoricoMm()).append(" mm, ")
+                    .append("adotado DN ").append(ramal.getDnAdotadoMm()).append(" mm a ")
+                    .append(ramal.getVelocidadeMs()).append(" m/s, ")
+                    .append("hidrômetro Qn ").append(ramal.getHidrometro().getVazaoNominalM3h())
+                    .append(" m3/h\n");
         }
         return true;
     }

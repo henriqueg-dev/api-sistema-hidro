@@ -70,6 +70,17 @@ public class PiscinaEntity {
     @Column(name = "num_ralos_adotado")
     private Integer numRalosAdotado;
 
+    // Valor bruto digitado pelo projetista, antes de resolver contra o calculo. Nulo quando
+    // o dispositivo acima foi obtido automaticamente.
+    @Column(name = "num_bocais_retorno_informado")
+    private Integer numBocaisRetornoInformado;
+
+    @Column(name = "num_skimmers_informado")
+    private Integer numSkimmersInformado;
+
+    @Column(name = "num_ralos_informado")
+    private Integer numRalosInformado;
+
     /** Sempre manual: 1 a cada 10 m de raio de alcance, definido no projeto. */
     @Column(name = "num_aspiradores", nullable = false)
     private Integer numAspiradores;

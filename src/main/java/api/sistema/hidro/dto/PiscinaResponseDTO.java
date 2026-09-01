@@ -40,10 +40,14 @@ public class PiscinaResponseDTO {
     private Double numBocaisPorVazao;
     private Double numBocaisPorArea;
     private Integer numBocaisRetornoAdotado;
+    /** Valor bruto digitado pelo projetista; nulo quando o cálculo definiu o número sozinho. */
+    private Integer numBocaisRetornoInformado;
     private Double numSkimmersCalculado;
     private Integer numSkimmersAdotado;
+    private Integer numSkimmersInformado;
     private Double numRalosCalculado;
     private Integer numRalosAdotado;
+    private Integer numRalosInformado;
     private Integer numAspiradores;
 
     private Double pressaoResidualMca;
