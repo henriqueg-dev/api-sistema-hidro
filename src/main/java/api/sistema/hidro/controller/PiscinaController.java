@@ -3,10 +3,13 @@ package api.sistema.hidro.controller;
 import api.sistema.hidro.dto.PiscinaReferenciasDTO;
 import api.sistema.hidro.dto.PiscinaRequestDTO;
 import api.sistema.hidro.dto.PiscinaResponseDTO;
+import api.sistema.hidro.service.MemorialPdfService;
 import api.sistema.hidro.service.PiscinaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +23,7 @@ import java.util.List;
 public class PiscinaController {
 
     private final PiscinaService piscinaService;
+    private final MemorialPdfService memorialPdfService;
 
     /** Tabelas da NBR 10339 e de comprimento equivalente usadas pela tela. */
     @GetMapping("/referencias")
@@ -47,6 +51,15 @@ public class PiscinaController {
     @GetMapping("/{id}")
     public ResponseEntity<PiscinaResponseDTO> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(piscinaService.buscarPorId(id));
+    }
+
+    @GetMapping("/{id}/memorial.pdf")
+    public ResponseEntity<byte[]> memorialPdf(@PathVariable Long id) {
+        byte[] pdf = memorialPdfService.gerarMemorialPiscina(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"memorial-piscina-" + id + ".pdf\"")
+                .body(pdf);
     }
 
     @GetMapping("/empreendimento/{empreendimentoId}")
