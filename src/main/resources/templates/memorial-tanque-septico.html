@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title th:text="'Memorial de cálculo - Tanque séptico ' + ${empreendimentoNome}">Memorial de cálculo</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 1.3cm 1.6cm 1.4cm;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 9.5pt;
+      color: #1e2430;
+    }
+
+    /* ---------- Cabeçalho ---------- */
+    .faixa {
+      background: #1d4ed8;
+      color: #fff;
+      padding: 9px 16px;
+      border-radius: 6px 6px 0 0;
+    }
+    .faixa .marca {
+      font-size: 8pt;
+      font-weight: bold;
+      letter-spacing: 2px;
+      opacity: 0.85;
+      margin: 0 0 4px;
+    }
+    .faixa h1 {
+      font-size: 16pt;
+      margin: 0;
+    }
+    .cabecalho-dados {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #dbe4f3;
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 2px rgba(20, 30, 60, 0.06);
+    }
+    .cabecalho-dados td {
+      padding: 7px 14px;
+      font-size: 9pt;
+      border-bottom: 1px solid #eef1f7;
+      width: 25%;
+    }
+    .cabecalho-dados tr:last-child td {
+      border-bottom: none;
+    }
+    .cabecalho-dados td.rotulo {
+      color: #8a93a6;
+      font-size: 7.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      width: 15%;
+    }
+    .cabecalho-dados td.valor {
+      font-weight: bold;
+      color: #1e2430;
+    }
+
+    /* ---------- Seções ---------- */
+    .secao-titulo {
+      display: block;
+      background: #eef3fb;
+      border-left: 4px solid #1d4ed8;
+      color: #1d4ed8;
+      font-size: 11pt;
+      font-weight: bold;
+      padding: 4px 10px;
+      margin: 12px 0 6px;
+      border-radius: 0 4px 4px 0;
+    }
+    .secao-nota {
+      font-size: 8.5pt;
+      color: #6b7280;
+      margin: -2px 0 6px;
+    }
+
+    table.dados {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 4px;
+    }
+    table.dados tr {
+      border-bottom: 1px solid #eef1f7;
+    }
+    table.dados td {
+      padding: 6px 4px;
+      font-size: 9.5pt;
+    }
+    table.dados td.rotulo {
+      color: #6b7280;
+      width: 55%;
+    }
+    table.dados td.valor {
+      font-weight: bold;
+      text-align: right;
+      color: #1e2430;
+    }
+    table.dados td.valor .detalhe {
+      font-weight: normal;
+      color: #8a93a6;
+      font-size: 8.5pt;
+    }
+
+    /* ---------- Destaque ---------- */
+    .destaque {
+      background: #1d4ed8;
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 6px;
+      margin: 6px 0 4px;
+    }
+    .destaque .rotulo {
+      font-size: 8pt;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0.85;
+      margin: 0 0 2px;
+    }
+    .destaque .valor {
+      font-size: 16pt;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .rodape {
+      margin-top: 12px;
+      padding-top: 6px;
+      border-top: 1px solid #dbe4f3;
+      font-size: 7.5pt;
+      color: #8a93a6;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="faixa">
+    <p class="marca">HIDROS</p>
+    <h1>Memorial de cálculo — Tanque séptico</h1>
+  </div>
+  <table class="cabecalho-dados">
+    <tr>
+      <td class="rotulo">Cliente</td>
+      <td class="valor" th:text="${clienteNome}">Cliente</td>
+      <td class="rotulo">Empreendimento</td>
+      <td class="valor" th:text="${empreendimentoNome}">Empreendimento</td>
+    </tr>
+    <tr>
+      <td class="rotulo">Forma do tanque</td>
+      <td class="valor" th:text="${formaRotulo}">Forma</td>
+      <td class="rotulo">Gerado em</td>
+      <td class="valor" th:text="${dataGeracao}">Data</td>
+    </tr>
+  </table>
+
+  <div class="secao-titulo">1. Dados de entrada</div>
+  <table class="dados">
+    <tr>
+      <td class="rotulo">Taxa de ocupação / Número de unidades</td>
+      <td class="valor" th:text="${tanque.taxaOcupacao} + ' / ' + ${tanque.numUnidades}"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Tipo de contribuição</td>
+      <td class="valor" th:text="${contribuicaoRotulo}"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Faixa de temperatura</td>
+      <td class="valor" th:text="${faixaRotulo}"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Intervalo entre limpezas</td>
+      <td class="valor" th:text="${tanque.intervaloLimpezaAnos} + ' ano(s)'"></td>
+    </tr>
+  </table>
+
+  <div class="secao-titulo">2. Resultado do dimensionamento</div>
+  <p class="secao-nota" th:if="${tanque.formula}" th:text="'Fórmula: ' + ${tanque.formula}">Fórmula</p>
+  <table class="dados">
+    <tr>
+      <td class="rotulo">N — população / unidades de contribuição</td>
+      <td class="valor" th:text="${tanque.populacao} + ' ' + ${unidadeRotulo}"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">C — contribuição de esgoto</td>
+      <td class="valor" th:text="${tanque.contribuicaoLitros} + ' L/unidade.dia'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Lf — contribuição de lodo fresco</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(tanque.lodoFrescoLitros,1,'POINT',2,'COMMA')} + ' L/unidade.dia'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">T — período de detenção</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(tanque.periodoDetencaoDias,1,'POINT',2,'COMMA')} + ' dias'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">K — taxa de acumulação de lodo</td>
+      <td class="valor" th:text="${tanque.taxaAcumulacaoDias} + ' dias'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Contribuição diária total</td>
+      <td class="valor" th:text="${tanque.contribuicaoDiariaLitros} + ' L/dia'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Volume calculado</td>
+      <td class="valor" th:text="${tanque.volumeCalculadoLitros} + ' L'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Volume adotado</td>
+      <td class="valor">
+        <span th:text="${tanque.volumeLitros} + ' L'">Volume</span>
+        <span class="detalhe" th:if="${tanque.volumeMinimoAplicado}">(mínimo da NBR aplicado)</span>
+      </td>
+    </tr>
+  </table>
+
+  <div class="secao-titulo">3. Geometria adotada</div>
+  <table class="dados">
+    <tr th:if="${tanque.larguraM != null}">
+      <td class="rotulo">Largura × Comprimento × Profundidade</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(tanque.larguraM,1,'POINT',2,'COMMA')} + ' × '
+                    + ${#numbers.formatDecimal(tanque.comprimentoM,1,'POINT',2,'COMMA')} + ' × '
+                    + ${#numbers.formatDecimal(tanque.profundidadeAdotadaM,1,'POINT',2,'COMMA')} + ' m'"></td>
+    </tr>
+    <tr th:if="${tanque.diametroM != null}">
+      <td class="rotulo">Diâmetro × Profundidade</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(tanque.diametroM,1,'POINT',2,'COMMA')} + ' × '
+                    + ${#numbers.formatDecimal(tanque.profundidadeAdotadaM,1,'POINT',2,'COMMA')} + ' m'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Câmara de gases</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(tanque.camaraGasesM,1,'POINT',2,'COMMA')} + ' m'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Altura construtiva total</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(tanque.alturaConstrutivaM,1,'POINT',2,'COMMA')} + ' m'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Folga sobre o volume mínimo</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(tanque.folgaM3,1,'POINT',3,'COMMA')} + ' m³ ('
+                    + ${#numbers.formatDecimal(tanque.folgaPercentual,1,'POINT',1,'COMMA')} + '%)'"></td>
+    </tr>
+  </table>
+
+  <div class="destaque">
+    <p class="rotulo">Volume real construído</p>
+    <p class="valor" th:text="${#numbers.formatDecimal(tanque.volumeRealM3,1,'POINT',2,'COMMA')} + ' m³'">
+      Volume real
+    </p>
+  </div>
+
+  <div class="rodape">
+    Documento gerado automaticamente pelo sistema Hidros em <span th:text="${dataGeracao}"></span>,
+    com base nos dados informados pelo usuário. O sistema não se responsabiliza pela exatidão desses
+    dados nem pelo uso deste memorial; a validação técnica é de responsabilidade do responsável técnico do projeto.
+  </div>
+
+</body>
+</html>

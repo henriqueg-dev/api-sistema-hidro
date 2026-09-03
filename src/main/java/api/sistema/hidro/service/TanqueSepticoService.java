@@ -84,6 +84,10 @@ public class TanqueSepticoService {
                 .toList();
     }
 
+    public TanqueSepticoResponseDTO buscarPorId(Long id) {
+        return toDTO(buscarEntidade(id));
+    }
+
     private void aplicarCalculo(TanqueSepticoEntity tanque, TanqueSepticoRequestDTO dto) {
         ContribuicaoDespejo contribuicao = dto.getContribuicaoDespejo();
 
