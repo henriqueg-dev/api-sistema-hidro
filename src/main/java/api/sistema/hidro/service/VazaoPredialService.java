@@ -85,6 +85,10 @@ public class VazaoPredialService {
                 .toList();
     }
 
+    public VazaoPredialResponseDTO buscarPorId(Long id) {
+        return toDTO(buscarEntidade(id));
+    }
+
     private void aplicarCalculo(VazaoPredialEntity vazao, VazaoPredialRequestDTO dto) {
         int populacao = dto.getTaxaOcupacao() * dto.getNumApartamentos();
         double consumoDiarioLitros = (double) populacao * dto.getConsumoPerCapita();
