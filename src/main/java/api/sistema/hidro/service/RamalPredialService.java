@@ -71,6 +71,10 @@ public class RamalPredialService {
                 .toList();
     }
 
+    public RamalPredialResponseDTO buscarPorId(Long id) {
+        return toDTO(buscarEntidade(id));
+    }
+
     private void aplicarCalculo(RamalPredialEntity ramal, RamalPredialRequestDTO dto,
                                 EmpreendimentoEntity empreendimento) {
         CalculoRamalPredial.Resultado calculo;
