@@ -16,6 +16,5 @@ public class RevisaoResponseDTO {
     private Long usuarioId;
     private String usuarioNome;
     private String usuarioEmail;
-    /** O que foi alterado, já legível: "Orçamento — Jardins". */
-    private List<String> alteracoes;
+    private List<AlteracaoDTO> alteracoes;
 }

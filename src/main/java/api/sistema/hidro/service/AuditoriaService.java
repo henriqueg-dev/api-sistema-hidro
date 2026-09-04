@@ -1,5 +1,6 @@
 package api.sistema.hidro.service;
 
+import api.sistema.hidro.dto.AlteracaoDTO;
 import api.sistema.hidro.dto.AuditoriaResponseDTO;
 import api.sistema.hidro.dto.RevisaoResponseDTO;
 import api.sistema.hidro.entity.RevisaoEntity;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.lang.reflect.Field;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +83,9 @@ public class AuditoriaService {
     private boolean combina(RevisaoResponseDTO revisao, String termo) {
         return Stream.concat(
                         Stream.of(revisao.getUsuarioNome(), revisao.getUsuarioEmail()),
-                        revisao.getAlteracoes().stream())
+                        revisao.getAlteracoes().stream().flatMap(alteracao -> Stream.concat(
+                                Stream.of(alteracao.getTipo(), alteracao.getNome()),
+                                alteracao.getCampos().stream())))
                 .filter(Objects::nonNull)
                 .anyMatch(campo -> campo.toLowerCase().contains(termo));
     }
@@ -111,19 +115,68 @@ public class AuditoriaService {
         return historico;
     }
 
-    /** "Orçamento — Jardins": o tipo e o nome do que foi tocado naquela revisão. */
-    private List<String> alteracoesDe(AuditReader leitor, int revisao) {
-        return leitor.getCrossTypeRevisionChangesReader().findEntities(revisao)
-                .stream()
-                .map(entidade -> {
-                    Object real = desembrulhar(entidade);
-                    String tipo = descreverTipo(real == null ? entidade.getClass() : real.getClass());
-                    String nome = nomeDe(entidade, PROFUNDIDADE_MAXIMA);
-                    return nome.isBlank() ? tipo : tipo + " — " + nome;
-                })
+    private List<AlteracaoDTO> alteracoesDe(AuditReader leitor, int revisao) {
+        Map<RevisionType, List<Object>> porAcao =
+                leitor.getCrossTypeRevisionChangesReader().findEntitiesGroupByRevisionType(revisao);
+
+        List<AlteracaoDTO> alteracoes = new ArrayList<>();
+        porAcao.forEach((acao, entidades) -> entidades.forEach(entidade -> {
+            Object real = desembrulhar(entidade);
+            alteracoes.add(new AlteracaoDTO(
+                    descreverTipo(real == null ? entidade.getClass() : real.getClass()),
+                    nomeDe(entidade, PROFUNDIDADE_MAXIMA),
+                    descrever(acao),
+                    acao == RevisionType.MOD ? camposAlterados(leitor, real, revisao) : List.of()));
+        }));
+
+        return alteracoes.stream()
                 .distinct()
-                .sorted()
+                .sorted(Comparator.comparing(AlteracaoDTO::getTipo).thenComparing(AlteracaoDTO::getNome))
                 .toList();
+    }
+
+    /** Duas consultas por registro alterado; se o log crescer, gravar o diff junto da revisão. */
+    private List<String> camposAlterados(AuditReader leitor, Object depois, int revisao) {
+        if (depois == null) return List.of();
+
+        Object antes = versaoAnterior(leitor, depois.getClass(), ler(depois, "id"), revisao);
+        if (antes == null) return List.of();
+
+        Map<String, Object> valoresAntes = valoresSimples(antes);
+        List<String> campos = new ArrayList<>();
+        valoresSimples(depois).forEach((campo, valor) -> {
+            Object anterior = valoresAntes.get(campo);
+            if (!Objects.equals(anterior, valor)) {
+                campos.add(rotular(campo) + ": " + exibir(anterior) + " → " + exibir(valor));
+            }
+        });
+        return campos;
+    }
+
+    private Object versaoAnterior(AuditReader leitor, Class<?> classe, Object id, int revisao) {
+        if (id == null) return null;
+        try {
+            Number anterior = (Number) leitor.createQuery()
+                    .forRevisionsOfEntity(classe, false, true)
+                    .addProjection(AuditEntity.revisionNumber().max())
+                    .add(AuditEntity.id().eq(id))
+                    .add(AuditEntity.revisionNumber().lt(revisao))
+                    .getSingleResult();
+            return anterior == null ? null : leitor.find(classe, id, anterior);
+        } catch (RuntimeException e) {
+            return null;
+        }
+    }
+
+    private String rotular(String campo) {
+        String texto = campo.replaceAll("(?<=[a-z0-9])(?=[A-Z])", " ").toLowerCase();
+        return Character.toUpperCase(texto.charAt(0)) + texto.substring(1);
+    }
+
+    private String exibir(Object valor) {
+        return valor == null || "null".equals(valor) || String.valueOf(valor).isBlank()
+                ? "—"
+                : String.valueOf(valor);
     }
 
     private String descreverTipo(Class<?> classe) {
