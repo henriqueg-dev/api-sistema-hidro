@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title th:text="'Orçamento - ' + ${empreendimentoNome}">Orçamento</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 1.3cm 1.6cm 1.4cm;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 9.5pt;
+      color: #1e2430;
+    }
+
+    /* ---------- Cabeçalho ---------- */
+    .faixa {
+      background: #1d4ed8;
+      color: #fff;
+      padding: 9px 16px;
+      border-radius: 6px 6px 0 0;
+    }
+    .faixa .marca {
+      font-size: 8pt;
+      font-weight: bold;
+      letter-spacing: 2px;
+      opacity: 0.85;
+      margin: 0 0 4px;
+    }
+    .faixa h1 {
+      font-size: 16pt;
+      margin: 0;
+    }
+    .cabecalho-dados {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #dbe4f3;
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 2px rgba(20, 30, 60, 0.06);
+    }
+    .cabecalho-dados td {
+      padding: 7px 14px;
+      font-size: 9pt;
+      border-bottom: 1px solid #eef1f7;
+      width: 25%;
+    }
+    .cabecalho-dados tr:last-child td {
+      border-bottom: none;
+    }
+    .cabecalho-dados td.rotulo {
+      color: #8a93a6;
+      font-size: 7.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      width: 15%;
+    }
+    .cabecalho-dados td.valor {
+      font-weight: bold;
+      color: #1e2430;
+    }
+
+    .badge-status {
+      display: inline-block;
+      font-size: 7.5pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      border-radius: 8px;
+    }
+    .badge-rascunho {
+      background: #eef1f7;
+      color: #6b7280;
+    }
+    .badge-enviado {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+    .badge-aprovado {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+    .badge-recusado {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    /* ---------- Seções ---------- */
+    .secao-titulo {
+      display: block;
+      background: #eef3fb;
+      border-left: 4px solid #1d4ed8;
+      color: #1d4ed8;
+      font-size: 11pt;
+      font-weight: bold;
+      padding: 4px 10px;
+      margin: 12px 0 6px;
+      border-radius: 0 4px 4px 0;
+    }
+
+    table.dados {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 4px;
+    }
+    table.dados tr {
+      border-bottom: 1px solid #eef1f7;
+    }
+    table.dados td {
+      padding: 6px 4px;
+      font-size: 9.5pt;
+    }
+    table.dados td.rotulo {
+      color: #6b7280;
+      width: 55%;
+    }
+    table.dados td.valor {
+      font-weight: bold;
+      text-align: right;
+      color: #1e2430;
+    }
+
+    /* ---------- Destaque ---------- */
+    .destaque {
+      background: #1d4ed8;
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 6px;
+      margin: 6px 0 4px;
+    }
+    .destaque .rotulo {
+      font-size: 8pt;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0.85;
+      margin: 0 0 2px;
+    }
+    .destaque .valor {
+      font-size: 16pt;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .observacoes {
+      font-size: 9pt;
+      color: #4b5563;
+      white-space: pre-wrap;
+    }
+
+    .rodape {
+      margin-top: 12px;
+      padding-top: 6px;
+      border-top: 1px solid #dbe4f3;
+      font-size: 7.5pt;
+      color: #8a93a6;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="faixa">
+    <p class="marca">HIDROS</p>
+    <h1>Orçamento — Projeto hidrossanitário</h1>
+  </div>
+  <table class="cabecalho-dados">
+    <tr>
+      <td class="rotulo">Cliente</td>
+      <td class="valor" th:text="${clienteNome}">Cliente</td>
+      <td class="rotulo">Empreendimento</td>
+      <td class="valor" th:text="${empreendimentoNome}">Empreendimento</td>
+    </tr>
+    <tr>
+      <td class="rotulo">Tipo</td>
+      <td class="valor" th:text="${orcamento.tipoEmpreendimento.descricao}">Tipo</td>
+      <td class="rotulo">Status</td>
+      <td class="valor">
+        <span class="badge-status"
+              th:classappend="'badge-' + ${#strings.toLowerCase(orcamento.status.name())}"
+              th:text="${orcamento.status.descricao}">Status</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="rotulo">Gerado em</td>
+      <td class="valor" colspan="3" th:text="${dataGeracao}">Data</td>
+    </tr>
+  </table>
+
+  <div class="secao-titulo">Item do orçamento</div>
+  <table class="dados">
+    <tr>
+      <td class="rotulo">Serviço</td>
+      <td class="valor" th:text="'Projeto hidrossanitário — ' + ${orcamento.tipoEmpreendimento.descricao}"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Quantidade</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(orcamento.quantidade,1,'POINT',2,'COMMA')} + ' ' + ${unidadeRotulo}"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Valor unitário</td>
+      <td class="valor" th:text="'R$ ' + ${#numbers.formatDecimal(orcamento.valorUnitario,1,'POINT',2,'COMMA')}
+                    + ' / ' + (${orcamento.tipoEmpreendimento.name() == 'PREDIO'} ? 'apartamento' : 'm²')"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Validade da proposta</td>
+      <td class="valor" th:text="'até ' + ${dataValidadeFormatada} + ' (' + ${orcamento.validadeDias} + ' dias)'"></td>
+    </tr>
+  </table>
+
+  <div class="destaque">
+    <p class="rotulo">Valor total do orçamento</p>
+    <p class="valor" th:text="'R$ ' + ${#numbers.formatDecimal(orcamento.valorTotal,1,'POINT',2,'COMMA')}">
+      Valor total
+    </p>
+  </div>
+
+  <div th:if="${orcamento.observacoes != null and not #strings.isEmpty(orcamento.observacoes)}">
+    <div class="secao-titulo">Observações</div>
+    <p class="observacoes" th:text="${orcamento.observacoes}"></p>
+  </div>
+
+  <div class="rodape">
+    Documento gerado automaticamente pelo sistema Hidros em <span th:text="${dataGeracao}"></span>.
+    Orçamento válido até <span th:text="${dataValidadeFormatada}"></span> e sujeito a alteração
+    conforme escopo definido em contrato. Valores não incluem taxas de ART/RRT ou custos de
+    terceiros, salvo indicação em contrário.
+  </div>
+
+</body>
+</html>

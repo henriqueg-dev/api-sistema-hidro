@@ -1,5 +1,6 @@
 package api.sistema.hidro.service;
 
+import api.sistema.hidro.dto.OrcamentoResponseDTO;
 import api.sistema.hidro.dto.PiscinaResponseDTO;
 import api.sistema.hidro.dto.RamalPredialResponseDTO;
 import api.sistema.hidro.dto.TanqueSepticoResponseDTO;
@@ -26,11 +27,13 @@ import java.time.format.DateTimeFormatter;
 public class MemorialPdfService {
 
     private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static final DateTimeFormatter FORMATO_DATA_CURTA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final PiscinaService piscinaService;
     private final RamalPredialService ramalPredialService;
     private final TanqueSepticoService tanqueSepticoService;
     private final VazaoPredialService vazaoPredialService;
+    private final OrcamentoService orcamentoService;
     private final EmpreendimentoRepository empreendimentoRepository;
     private final TemplateEngine templateEngine;
 
@@ -72,14 +75,27 @@ public class MemorialPdfService {
         return renderizarPdf("memorial-vazao-predial", contexto);
     }
 
+    @Transactional(readOnly = true)
+    public byte[] gerarPdfOrcamento(Long id) {
+        OrcamentoResponseDTO orcamento = orcamentoService.buscarPorId(id);
+        Context contexto = contextoBase(orcamento.getClienteNome(), orcamento.getNomeEmpreendimento());
+        contexto.setVariable("orcamento", orcamento);
+        contexto.setVariable("unidadeRotulo", RotulosPdf.unidadeOrcamento(orcamento.getTipoEmpreendimento()));
+        contexto.setVariable("dataValidadeFormatada", FORMATO_DATA_CURTA.format(orcamento.getDataValidade()));
+        return renderizarPdf("orcamento", contexto);
+    }
+
     /** Cabeçalho comum a todo memorial: nome do cliente/empreendimento e data de geração. */
     private Context contextoBase(Long empreendimentoId) {
         EmpreendimentoEntity empreendimento = empreendimentoRepository.findById(empreendimentoId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Empreendimento não encontrado"));
+        return contextoBase(empreendimento.getCliente().getNome(), empreendimento.getNome());
+    }
 
+    private Context contextoBase(String clienteNome, String empreendimentoNome) {
         Context contexto = new Context();
-        contexto.setVariable("empreendimentoNome", empreendimento.getNome());
-        contexto.setVariable("clienteNome", empreendimento.getCliente().getNome());
+        contexto.setVariable("empreendimentoNome", empreendimentoNome);
+        contexto.setVariable("clienteNome", clienteNome);
         contexto.setVariable("dataGeracao", FORMATO_DATA.format(LocalDateTime.now()));
         return contexto;
     }

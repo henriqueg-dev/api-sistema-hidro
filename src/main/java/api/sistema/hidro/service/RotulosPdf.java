@@ -4,6 +4,7 @@ import api.sistema.hidro.enums.ContribuicaoDespejo;
 import api.sistema.hidro.enums.FaixaTemperatura;
 import api.sistema.hidro.enums.FormaTanque;
 import api.sistema.hidro.enums.HidrometroPadrao;
+import api.sistema.hidro.enums.TipoEmpreendimento;
 import api.sistema.hidro.enums.UnidadeContribuicao;
 
 import java.util.Map;
@@ -93,5 +94,9 @@ final class RotulosPdf {
     static String concessionaria(String chave) {
         if (chave == null || chave.isBlank()) return "";
         return CONCESSIONARIAS.getOrDefault(chave, chave);
+    }
+
+    static String unidadeOrcamento(TipoEmpreendimento tipo) {
+        return tipo == TipoEmpreendimento.PREDIO ? "apartamentos" : "m²";
     }
 }
