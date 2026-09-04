@@ -4,9 +4,12 @@ import api.sistema.hidro.enums.PerfilUsuario;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import java.time.LocalDateTime;
 
+@Audited
 @Entity
 @Table(name = "tb_usuario")
 @Getter
@@ -27,6 +30,7 @@ public class UsuarioEntity {
     private String email;
 
     @Column(nullable = false)
+    @NotAudited
     private String senha;
 
     @Enumerated(EnumType.STRING)

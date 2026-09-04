@@ -5,10 +5,12 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.envers.Audited;
 
 import java.time.LocalDateTime;
 
 /** Recirculação de uma piscina (NBR 10339). Um empreendimento pode ter várias. */
+@Audited
 @Entity
 @Table(name = "tb_piscina")
 @Getter

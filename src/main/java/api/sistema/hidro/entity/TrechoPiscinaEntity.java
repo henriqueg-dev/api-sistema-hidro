@@ -3,8 +3,10 @@ package api.sistema.hidro.entity;
 import api.sistema.hidro.enums.SentidoTrecho;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.envers.Audited;
 
 /** Trecho da tubulação de recirculação, do ralo até o bocal mais desfavorável. */
+@Audited
 @Entity
 @Table(name = "tb_trecho_piscina")
 @Getter

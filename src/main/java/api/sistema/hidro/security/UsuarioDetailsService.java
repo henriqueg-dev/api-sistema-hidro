@@ -3,7 +3,6 @@ package api.sistema.hidro.security;
 import api.sistema.hidro.entity.UsuarioEntity;
 import api.sistema.hidro.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,11 +19,6 @@ public class UsuarioDetailsService implements UserDetailsService {
         UsuarioEntity usuarioEntity = repository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
-        return User.builder()
-                .username(usuarioEntity.getEmail())
-                .password(usuarioEntity.getSenha())
-                .roles(usuarioEntity.getPerfil().name())
-                .disabled(!Boolean.TRUE.equals(usuarioEntity.getAtivo()))
-                .build();
+        return new UsuarioAutenticado(usuarioEntity);
     }
 }

@@ -3,8 +3,10 @@ package api.sistema.hidro.entity;
 import api.sistema.hidro.enums.TipoConexao;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.envers.Audited;
 
 /** Conexões de um trecho, contadas no isométrico do projeto. */
+@Audited
 @Entity
 @Table(name = "tb_conexao_trecho")
 @Getter

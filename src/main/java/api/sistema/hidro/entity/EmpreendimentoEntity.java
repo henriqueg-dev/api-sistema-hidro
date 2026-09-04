@@ -4,9 +4,11 @@ import api.sistema.hidro.enums.TipoEmpreendimento;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.envers.Audited;
 
 import java.time.LocalDateTime;
 
+@Audited
 @Entity
 @Table(name = "tb_empreendimento")
 @Getter

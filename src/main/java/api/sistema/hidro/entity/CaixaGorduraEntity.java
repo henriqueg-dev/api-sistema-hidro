@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.envers.Audited;
 
 import java.time.LocalDateTime;
 
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
  * Cálculo de caixa de gordura e sabão. Cada empreendimento pode ter no máximo
  * dois — o limite é aplicado em {@link api.sistema.hidro.service.CaixaGorduraService}.
  */
+@Audited
 @Entity
 @Table(name = "tb_caixa_gordura")
 @Getter
