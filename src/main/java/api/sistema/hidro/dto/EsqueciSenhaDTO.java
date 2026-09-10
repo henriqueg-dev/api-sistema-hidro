@@ -1,23 +1,15 @@
 package api.sistema.hidro.dto;
 
-import api.sistema.hidro.enums.PerfilUsuario;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class UsuarioRequestDTO {
-
-    @NotBlank(message = "Nome é obrigatório")
-    private String nome;
+public class EsqueciSenhaDTO {
 
     @Email(message = "Email inválido")
     @NotBlank(message = "Email é obrigatório")
     private String email;
-
-    @NotNull(message = "Perfil é obrigatório")
-    private PerfilUsuario perfil;
 }

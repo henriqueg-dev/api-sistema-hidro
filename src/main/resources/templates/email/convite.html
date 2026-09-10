@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body style="margin:0; padding:32px 16px; background:#f1f5f9; font-family:Helvetica,Arial,sans-serif; color:#1e2430;">
+  <table role="presentation" width="100%" style="max-width:480px; margin:0 auto; background:#ffffff; border-radius:8px; overflow:hidden;">
+    <tr>
+      <td style="background:#1d4ed8; color:#ffffff; padding:20px 28px; font-size:16pt; font-weight:bold;">
+        SistemaHidro
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:28px;">
+        <p style="margin:0 0 16px; font-size:11pt;">Olá, <span th:text="${nome}">nome</span>.</p>
+        <p style="margin:0 0 20px; font-size:11pt;">
+          Você foi convidado para acessar o SistemaHidro. Use o código abaixo pra definir sua senha e ativar sua conta.
+        </p>
+        <p style="margin:0 0 20px; text-align:center;">
+          <span style="display:inline-block; padding:12px 24px; background:#eff6ff; color:#1d4ed8; font-size:20pt; font-weight:bold; letter-spacing:4px; border-radius:6px;" th:text="${codigo}">000000</span>
+        </p>
+        <p style="margin:0 0 20px; font-size:11pt; text-align:center;">
+          <a th:href="${link}" style="color:#1d4ed8;">Definir minha senha</a>
+        </p>
+        <p style="margin:0; font-size:9pt; color:#6b7280;">
+          Se você não esperava este convite, pode ignorar este e-mail.
+        </p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

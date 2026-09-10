@@ -59,9 +59,10 @@ Frontend (Vue.js 3)  ⇄  Backend (Spring Boot 4)  ⇄  Banco de Dados (PostgreS
 - Login com geração de token JWT
 - Controle de acesso por perfil via `@PreAuthorize`
 - Token com expiração de 24 horas
+- Recuperação de senha por código enviado ao e-mail (Resend)
 
 ### 👤 Gestão de Usuários *(Admin)*
-- Criar usuários (Admin e Engenheiro)
+- Convidar usuários por e-mail (Admin e Engenheiro) — o convidado define a própria senha
 - Listar todos os usuários
 - Ativar / desativar usuários
 
@@ -172,13 +173,16 @@ tb_prumada (tabelas normativas)
 | Método | Rota | Descrição |
 |---|---|---|
 | POST | `/api/auth/login` | Realiza login e retorna o token JWT |
+| POST | `/api/auth/esqueci-senha` | Envia por e-mail um código para redefinir a senha |
+| POST | `/api/auth/redefinir-senha` | Confirma o código (recuperação ou convite) e define a senha |
 
 ### Usuários
 | Método | Rota | Descrição | Perfil |
 |---|---|---|---|
-| POST | `/api/usuarios` | Criar usuário | ADMIN |
+| POST | `/api/usuarios` | Convidar usuário (envia e-mail com código; a senha é definida pelo convidado) | ADMIN |
 | GET | `/api/usuarios` | Listar usuários | ADMIN |
 | PATCH | `/api/usuarios/{id}/status` | Ativar/desativar | ADMIN |
+| POST | `/api/usuarios/{id}/reenviar-convite` | Reenvia o e-mail de convite (convite ainda pendente) | ADMIN |
 
 ### Empresas
 | Método | Rota | Descrição |

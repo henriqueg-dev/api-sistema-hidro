@@ -44,4 +44,11 @@ public class UsuarioController {
                                                             @RequestParam Boolean ativo) {
         return ResponseEntity.ok(usuarioService.alterarStatus(id, ativo));
     }
+
+    @PostMapping("/{id}/reenviar-convite")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> reenviarConvite(@PathVariable Long id) {
+        usuarioService.reenviarConvite(id);
+        return ResponseEntity.noContent().build();
+    }
 }

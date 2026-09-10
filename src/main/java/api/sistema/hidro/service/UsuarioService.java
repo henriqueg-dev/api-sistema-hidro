@@ -5,9 +5,11 @@ import api.sistema.hidro.dto.UsuarioResponseDTO;
 import api.sistema.hidro.exception.RecursoNaoEncontradoException;
 import api.sistema.hidro.exception.RegraNegocioException;
 import api.sistema.hidro.entity.UsuarioEntity;
+import api.sistema.hidro.enums.FinalidadeCodigo;
 import api.sistema.hidro.enums.PerfilUsuario;
 import api.sistema.hidro.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +26,11 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CodigoVerificacaoService codigoVerificacaoService;
+    private final EmailService emailService;
+
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
     @Transactional
     public UsuarioResponseDTO criar(UsuarioRequestDTO dto) {
@@ -33,13 +41,33 @@ public class UsuarioService {
         UsuarioEntity usuarioEntity = UsuarioEntity.builder()
                 .nome(dto.getNome())
                 .email(dto.getEmail())
-                .senha(passwordEncoder.encode(dto.getSenha()))
+                .senha(passwordEncoder.encode(UUID.randomUUID().toString()))
                 .perfil(dto.getPerfil())
-                .ativo(true)
+                .ativo(false)
+                .convitePendente(true)
                 .build();
 
         usuarioRepository.save(usuarioEntity);
+        enviarConvite(usuarioEntity);
         return toDTO(usuarioEntity);
+    }
+
+    @Transactional
+    public void reenviarConvite(Long id) {
+        UsuarioEntity usuarioEntity = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
+
+        if (!Boolean.TRUE.equals(usuarioEntity.getConvitePendente())) {
+            throw new RegraNegocioException("Este usuário já aceitou o convite");
+        }
+
+        enviarConvite(usuarioEntity);
+    }
+
+    private void enviarConvite(UsuarioEntity usuarioEntity) {
+        String codigo = codigoVerificacaoService.gerar(usuarioEntity, FinalidadeCodigo.CONVITE);
+        String link = frontendUrl + "/definir-senha?email=" + usuarioEntity.getEmail() + "&codigo=" + codigo;
+        emailService.enviarConvite(usuarioEntity.getEmail(), usuarioEntity.getNome(), codigo, link);
     }
 
     public List<UsuarioResponseDTO> listarTodos() {
@@ -56,6 +84,9 @@ public class UsuarioService {
 
         if (Boolean.FALSE.equals(ativo)) {
             validarDesativacao(usuarioEntity);
+        } else if (Boolean.TRUE.equals(usuarioEntity.getConvitePendente())) {
+            throw new RegraNegocioException(
+                    "Usuário ainda não aceitou o convite; reenvie o convite em vez de ativar");
         }
 
         usuarioEntity.setAtivo(ativo);
@@ -63,7 +94,6 @@ public class UsuarioService {
         return toDTO(usuarioEntity);
     }
 
-    /** Só o próprio dono troca a senha: nem o administrador altera a senha de terceiros. */
     @Transactional
     public void alterarSenhaPropria(String senhaAtual, String novaSenha) {
         UsuarioEntity usuarioEntity = usuarioRepository.findByEmail(emailAutenticado())
@@ -105,6 +135,7 @@ public class UsuarioService {
                 usuarioEntity.getEmail(),
                 usuarioEntity.getPerfil(),
                 usuarioEntity.getAtivo(),
+                usuarioEntity.getConvitePendente(),
                 usuarioEntity.getCriadoEm());
     }
 }

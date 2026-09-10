@@ -40,6 +40,10 @@ public class UsuarioEntity {
     @Builder.Default
     private Boolean ativo = true;
 
+    @Builder.Default
+    @NotAudited
+    private Boolean convitePendente = false;
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime criadoEm;

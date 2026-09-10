@@ -16,5 +16,6 @@ public class UsuarioResponseDTO {
     private String email;
     private PerfilUsuario perfil;
     private Boolean ativo;
+    private Boolean convitePendente;
     private LocalDateTime criadoEm;
 }
