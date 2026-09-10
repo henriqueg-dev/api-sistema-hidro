@@ -19,7 +19,7 @@ public class CodigoVerificacaoEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "usuario_id", nullable = false, unique = true)
     private UsuarioEntity usuario;
 
