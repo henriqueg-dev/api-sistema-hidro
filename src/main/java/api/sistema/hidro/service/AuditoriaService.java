@@ -10,6 +10,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
+import org.hibernate.UnknownEntityTypeException;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
 import org.hibernate.envers.AuditReader;
@@ -116,8 +117,19 @@ public class AuditoriaService {
     }
 
     private List<AlteracaoDTO> alteracoesDe(AuditReader leitor, int revisao) {
-        Map<RevisionType, List<Object>> porAcao =
-                leitor.getCrossTypeRevisionChangesReader().findEntitiesGroupByRevisionType(revisao);
+        Map<RevisionType, List<Object>> porAcao;
+        try {
+            porAcao = leitor.getCrossTypeRevisionChangesReader()
+                    .findEntitiesGroupByRevisionType(revisao);
+        } catch (UnknownEntityTypeException e) {
+            // O log é imutável, o código não: revisão antiga de uma entidade que o sistema não
+            // tem mais. O Envers falha ao resolver a classe e derrubaria a linha do tempo inteira.
+            return List.of(new AlteracaoDTO(
+                    "Registro histórico",
+                    "Entidade que não existe mais no sistema",
+                    "Alteração",
+                    List.of()));
+        }
 
         List<AlteracaoDTO> alteracoes = new ArrayList<>();
         porAcao.forEach((acao, entidades) -> entidades.forEach(entidade -> {
