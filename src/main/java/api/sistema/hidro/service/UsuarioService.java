@@ -2,6 +2,7 @@ package api.sistema.hidro.service;
 
 import api.sistema.hidro.dto.UsuarioRequestDTO;
 import api.sistema.hidro.dto.UsuarioResponseDTO;
+import api.sistema.hidro.enums.PlanoAssinatura;
 import api.sistema.hidro.exception.RecursoNaoEncontradoException;
 import api.sistema.hidro.exception.RegraNegocioException;
 import api.sistema.hidro.entity.UsuarioEntity;
@@ -21,22 +22,24 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(value = "tenantTransactionManager", readOnly = true)
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final CodigoVerificacaoService codigoVerificacaoService;
     private final EmailService emailService;
+    private final AssinaturaService assinaturaService;
 
     @Value("${app.frontend-url}")
     private String frontendUrl;
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public UsuarioResponseDTO criar(UsuarioRequestDTO dto) {
         if (usuarioRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new RegraNegocioException("Email já cadastrado");
         }
+        validarLimiteUsuarios();
 
         UsuarioEntity usuarioEntity = UsuarioEntity.builder()
                 .nome(dto.getNome())
@@ -52,7 +55,7 @@ public class UsuarioService {
         return toDTO(usuarioEntity);
     }
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public void reenviarConvite(Long id) {
         UsuarioEntity usuarioEntity = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
@@ -77,7 +80,7 @@ public class UsuarioService {
                 .toList();
     }
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public UsuarioResponseDTO alterarStatus(Long id, Boolean ativo) {
         UsuarioEntity usuarioEntity = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
@@ -94,7 +97,7 @@ public class UsuarioService {
         return toDTO(usuarioEntity);
     }
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public void alterarSenhaPropria(String senhaAtual, String novaSenha) {
         UsuarioEntity usuarioEntity = usuarioRepository.findByEmail(emailAutenticado())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
@@ -120,6 +123,18 @@ public class UsuarioService {
                 && usuarioRepository.countByPerfilAndAtivoTrue(PerfilUsuario.ADMIN) <= 1) {
             throw new RegraNegocioException(
                     "O sistema precisa ter pelo menos um administrador ativo");
+        }
+    }
+
+    /** -1 = ilimitado (ver PlanoAssinatura.maxUsuarios). */
+    private void validarLimiteUsuarios() {
+        PlanoAssinatura plano = assinaturaService.planoAtual();
+        if (plano == null || plano.getMaxUsuarios() < 0) {
+            return;
+        }
+        if (usuarioRepository.count() >= plano.getMaxUsuarios()) {
+            throw new RegraNegocioException("Limite de " + plano.getMaxUsuarios()
+                    + " usuários do plano " + plano.getDescricao() + " atingido. Faça upgrade para convidar mais gente.");
         }
     }
 

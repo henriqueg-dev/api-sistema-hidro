@@ -17,7 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(value = "tenantTransactionManager", readOnly = true)
 public class RamalPredialService {
 
     public static final String FORMULA = "Q = Cd / T   e   D = raiz(4Q / pi.v)";
@@ -32,7 +32,7 @@ public class RamalPredialService {
     private final RamalPredialRepository ramalPredialRepository;
     private final EmpreendimentoRepository empreendimentoRepository;
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public RamalPredialResponseDTO criar(RamalPredialRequestDTO dto) {
         EmpreendimentoEntity empreendimento = buscarEmpreendimento(dto.getEmpreendimentoId());
 
@@ -50,7 +50,7 @@ public class RamalPredialService {
         return toDTO(ramal);
     }
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public RamalPredialResponseDTO atualizar(Long id, RamalPredialRequestDTO dto) {
         RamalPredialEntity ramal = buscarEntidade(id);
 
@@ -59,7 +59,7 @@ public class RamalPredialService {
         return toDTO(ramal);
     }
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public void excluir(Long id) {
         ramalPredialRepository.delete(buscarEntidade(id));
     }

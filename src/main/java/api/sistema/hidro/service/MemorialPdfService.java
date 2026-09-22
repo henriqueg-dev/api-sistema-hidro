@@ -37,7 +37,7 @@ public class MemorialPdfService {
     private final EmpreendimentoRepository empreendimentoRepository;
     private final TemplateEngine templateEngine;
 
-    @Transactional(readOnly = true)
+    @Transactional(value = "tenantTransactionManager", readOnly = true)
     public byte[] gerarMemorialPiscina(Long piscinaId) {
         PiscinaResponseDTO piscina = piscinaService.buscarPorId(piscinaId);
         Context contexto = contextoBase(piscina.getEmpreendimentoId());
@@ -45,7 +45,7 @@ public class MemorialPdfService {
         return renderizarPdf("memorial-piscina", contexto);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(value = "tenantTransactionManager", readOnly = true)
     public byte[] gerarMemorialRamalPredial(Long id) {
         RamalPredialResponseDTO ramal = ramalPredialService.buscarPorId(id);
         Context contexto = contextoBase(ramal.getEmpreendimentoId());
@@ -55,7 +55,7 @@ public class MemorialPdfService {
         return renderizarPdf("memorial-ramal-predial", contexto);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(value = "tenantTransactionManager", readOnly = true)
     public byte[] gerarMemorialTanqueSeptico(Long id) {
         TanqueSepticoResponseDTO tanque = tanqueSepticoService.buscarPorId(id);
         Context contexto = contextoBase(tanque.getEmpreendimentoId());
@@ -67,7 +67,7 @@ public class MemorialPdfService {
         return renderizarPdf("memorial-tanque-septico", contexto);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(value = "tenantTransactionManager", readOnly = true)
     public byte[] gerarMemorialVazaoPredial(Long id) {
         VazaoPredialResponseDTO vazao = vazaoPredialService.buscarPorId(id);
         Context contexto = contextoBase(vazao.getEmpreendimentoId());
@@ -75,7 +75,7 @@ public class MemorialPdfService {
         return renderizarPdf("memorial-vazao-predial", contexto);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(value = "tenantTransactionManager", readOnly = true)
     public byte[] gerarPdfOrcamento(Long id) {
         OrcamentoResponseDTO orcamento = orcamentoService.buscarPorId(id);
         Context contexto = contextoBase(orcamento.getClienteNome(), orcamento.getNomeEmpreendimento());

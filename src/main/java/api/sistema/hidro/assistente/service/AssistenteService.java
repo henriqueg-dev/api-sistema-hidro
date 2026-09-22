@@ -11,10 +11,12 @@ import api.sistema.hidro.assistente.repository.ConversaRepository;
 import api.sistema.hidro.assistente.repository.MensagemRepository;
 import api.sistema.hidro.entity.EmpreendimentoEntity;
 import api.sistema.hidro.entity.UsuarioEntity;
+import api.sistema.hidro.enums.PlanoAssinatura;
 import api.sistema.hidro.exception.RecursoNaoEncontradoException;
 import api.sistema.hidro.exception.RegraNegocioException;
 import api.sistema.hidro.repository.EmpreendimentoRepository;
 import api.sistema.hidro.repository.UsuarioRepository;
+import api.sistema.hidro.service.AssinaturaService;
 import com.anthropic.errors.AnthropicServiceException;
 import com.anthropic.models.messages.CacheControlEphemeral;
 import com.anthropic.models.messages.Message;
@@ -33,13 +35,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(value = "tenantTransactionManager", readOnly = true)
 public class AssistenteService {
 
     private static final Logger log = LoggerFactory.getLogger(AssistenteService.class);
@@ -60,6 +64,7 @@ public class AssistenteService {
     private final EmpreendimentoRepository empreendimentoRepository;
     private final ContextoEmpreendimento contextoEmpreendimento;
     private final ClaudeClientProvider claudeClientProvider;
+    private final AssinaturaService assinaturaService;
 
     public boolean assistenteConfigurado() {
         return claudeClientProvider.configurado();
@@ -77,8 +82,9 @@ public class AssistenteService {
         return montarDetalhe(buscarConversaDoUsuario(id, email));
     }
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public ConversaDetalheDTO criarConversa(MensagemRequestDTO dto, String email) {
+        validarLimiteMensagens();
         UsuarioEntity usuario = buscarUsuario(email);
 
         EmpreendimentoEntity empreendimento = null;
@@ -99,8 +105,9 @@ public class AssistenteService {
         return montarDetalhe(conversa);
     }
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public MensagemResponseDTO enviarMensagem(Long conversaId, MensagemRequestDTO dto, String email) {
+        validarLimiteMensagens();
         ConversaEntity conversa = buscarConversaDoUsuario(conversaId, email);
         MensagemEntity resposta = responder(conversa, dto.getMensagem());
 
@@ -110,7 +117,7 @@ public class AssistenteService {
         return toMensagemDTO(resposta);
     }
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public void excluirConversa(Long id, String email) {
         ConversaEntity conversa = buscarConversaDoUsuario(id, email);
         mensagemRepository.deleteByConversaId(conversa.getId());
@@ -218,6 +225,24 @@ public class AssistenteService {
         return limpa.length() <= TAMANHO_TITULO
                 ? limpa
                 : limpa.substring(0, TAMANHO_TITULO).strip() + "...";
+    }
+
+    /** -1 = ilimitado, 0 = sem acesso (ver PlanoAssinatura.limiteMensagensAssistenteMes). */
+    private void validarLimiteMensagens() {
+        PlanoAssinatura plano = assinaturaService.planoAtual();
+        if (plano == null || plano.getLimiteMensagensAssistenteMes() < 0) {
+            return;
+        }
+        if (plano.getLimiteMensagensAssistenteMes() == 0) {
+            throw new RegraNegocioException(
+                    "O plano " + plano.getDescricao() + " não inclui o assistente de IA. Faça upgrade para usar.");
+        }
+        LocalDateTime inicioMes = LocalDate.now().withDayOfMonth(1).atStartOfDay();
+        long usadas = mensagemRepository.countByPapelAndCriadoEmGreaterThanEqual(PapelMensagem.USUARIO, inicioMes);
+        if (usadas >= plano.getLimiteMensagensAssistenteMes()) {
+            throw new RegraNegocioException("Limite de " + plano.getLimiteMensagensAssistenteMes()
+                    + " mensagens do assistente neste mês foi atingido. Volta a liberar no mês que vem, ou faça upgrade.");
+        }
     }
 
     private ConversaEntity buscarConversaDoUsuario(Long id, String email) {

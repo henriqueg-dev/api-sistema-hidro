@@ -14,4 +14,5 @@ public class LoginResponse {
     private String nome;
     private String email;
     private String perfil;
+    private String nomeEscritorio;
 }
