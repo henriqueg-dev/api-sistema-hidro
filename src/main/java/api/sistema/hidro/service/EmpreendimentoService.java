@@ -15,13 +15,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(value = "tenantTransactionManager", readOnly = true)
 public class EmpreendimentoService {
 
     private final EmpreendimentoRepository empreendimentoRepository;
     private final ClienteRepository clienteRepository;
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public EmpreendimentoResponseDTO criar(EmpreendimentoRequestDTO dto) {
         ClienteEntity cliente = clienteRepository.findById(dto.getClienteId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente não encontrado"));
@@ -51,7 +51,7 @@ public class EmpreendimentoService {
     }
 
     /** A cliente vinculada não muda: o {@code clienteId} do DTO é ignorado. */
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public EmpreendimentoResponseDTO atualizar(Long id, EmpreendimentoRequestDTO dto) {
         EmpreendimentoEntity empreendimento = buscarEntidade(id);
         empreendimento.setNome(dto.getNome());
@@ -64,7 +64,7 @@ public class EmpreendimentoService {
     }
 
     /** Exclusão lógica: o empreendimento deixa de aparecer nas listagens da cliente. */
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public void excluir(Long id) {
         EmpreendimentoEntity empreendimento = buscarEntidade(id);
         empreendimento.setAtivo(false);

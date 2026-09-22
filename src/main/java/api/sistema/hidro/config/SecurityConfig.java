@@ -1,6 +1,7 @@
 package api.sistema.hidro.config;
 
 import api.sistema.hidro.exception.GlobalExceptionHandler;
+import api.sistema.hidro.security.AssinaturaFiltro;
 import api.sistema.hidro.security.JwtFiltro;
 import api.sistema.hidro.security.RateLimitFiltro;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ public class SecurityConfig {
 
     private final JwtFiltro jwtFiltro;
     private final RateLimitFiltro rateLimitFiltro;
+    private final AssinaturaFiltro assinaturaFiltro;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
@@ -51,10 +53,11 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/webhooks/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(rateLimitFiltro, UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(jwtFiltro, RateLimitFiltro.class);
+                .addFilterAfter(jwtFiltro, RateLimitFiltro.class)
+                .addFilterAfter(assinaturaFiltro, JwtFiltro.class);
 
         return http.build();
     }

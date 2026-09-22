@@ -32,7 +32,7 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(value = "tenantTransactionManager", readOnly = true)
 public class AuditoriaService {
 
     /** Até onde seguir relação atrás de um nome: conexão -> trecho -> piscina -> empreendimento. */
@@ -41,7 +41,7 @@ public class AuditoriaService {
     /** Teto de linhas devolvidas, com ou sem busca. */
     private static final int LIMITE = 200;
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "tenant")
     private EntityManager entityManager;
 
     private final RevisaoRepository revisaoRepository;

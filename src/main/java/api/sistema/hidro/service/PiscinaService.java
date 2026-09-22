@@ -30,7 +30,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(value = "tenantTransactionManager", readOnly = true)
 public class PiscinaService {
 
     private final PiscinaRepository piscinaRepository;
@@ -38,7 +38,7 @@ public class PiscinaService {
     private final ConexaoTrechoRepository conexaoRepository;
     private final EmpreendimentoRepository empreendimentoRepository;
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public PiscinaResponseDTO criar(PiscinaRequestDTO dto) {
         EmpreendimentoEntity empreendimento = empreendimentoRepository.findById(dto.getEmpreendimentoId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Empreendimento não encontrado"));
@@ -52,7 +52,7 @@ public class PiscinaService {
         return montarResposta(piscina);
     }
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public PiscinaResponseDTO atualizar(Long id, PiscinaRequestDTO dto) {
         PiscinaEntity piscina = buscarEntidade(id);
 
@@ -65,7 +65,7 @@ public class PiscinaService {
         return montarResposta(piscina);
     }
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public void excluir(Long id) {
         PiscinaEntity piscina = buscarEntidade(id);
         apagarTrechos(piscina.getId());

@@ -16,7 +16,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(value = "tenantTransactionManager", readOnly = true)
 public class CaixaGorduraService {
 
     // Volume da caixa de gordura e sabão: V = 2 x N + 20, em litros,
@@ -31,7 +31,7 @@ public class CaixaGorduraService {
     private final CaixaGorduraRepository caixaGorduraRepository;
     private final EmpreendimentoRepository empreendimentoRepository;
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public CaixaGorduraResponseDTO criar(CaixaGorduraRequestDTO dto) {
         EmpreendimentoEntity empreendimento = empreendimentoRepository.findById(dto.getEmpreendimentoId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Empreendimento não encontrado"));
@@ -51,7 +51,7 @@ public class CaixaGorduraService {
         return toDTO(caixaGordura);
     }
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public CaixaGorduraResponseDTO atualizar(Long id, CaixaGorduraRequestDTO dto) {
         CaixaGorduraEntity caixaGordura = caixaGorduraRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Cálculo de caixa de gordura não encontrado"));
@@ -61,7 +61,7 @@ public class CaixaGorduraService {
         return toDTO(caixaGordura);
     }
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public void excluir(Long id) {
         CaixaGorduraEntity caixaGordura = caixaGorduraRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Cálculo de caixa de gordura não encontrado"));

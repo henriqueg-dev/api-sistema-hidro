@@ -33,7 +33,7 @@ public class CodigoVerificacaoService {
     @Value("${codigo-verificacao.max-tentativas:5}")
     private int maxTentativas;
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public String gerar(UsuarioEntity usuario, FinalidadeCodigo finalidade) {
         String codigo = String.format("%06d", ALEATORIO.nextInt(1_000_000));
         long minutos = finalidade == FinalidadeCodigo.CONVITE
@@ -52,7 +52,7 @@ public class CodigoVerificacaoService {
         return codigo;
     }
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public FinalidadeCodigo validar(UsuarioEntity usuario, String codigo) {
         CodigoVerificacaoEntity entidade = codigoVerificacaoRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new RegraNegocioException(MSG_CODIGO_INVALIDO));

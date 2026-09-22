@@ -33,19 +33,27 @@ public class JwtFiltro extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            String token = authHeader.substring(7);
+
+            if (jwtUtil.tokenValido(token)) {
+                // Precisa vir antes de qualquer busca ao tenant — UsuarioDetailsService lê daqui.
+                TenantContext.definir(jwtUtil.extrairContaId(token));
+                autenticar(request, jwtUtil.extrairEmail(token));
+                renovarSeNecessario(response, token);
+            }
+
             filterChain.doFilter(request, response);
-            return;
+        } finally {
+            // A thread volta pro pool do Tomcat entre requisições: sem isso, a próxima
+            // requisição naquela thread herdaria o tenant desta.
+            TenantContext.limpar();
         }
-
-        String token = authHeader.substring(7);
-
-        if (jwtUtil.tokenValido(token)) {
-            autenticar(request, jwtUtil.extrairEmail(token));
-            renovarSeNecessario(response, token);
-        }
-
-        filterChain.doFilter(request, response);
     }
 
     private void renovarSeNecessario(HttpServletResponse response, String token) {
@@ -55,7 +63,8 @@ public class JwtFiltro extends OncePerRequestFilter {
 
         if (jwtUtil.precisaRenovar(token)) {
             response.setHeader(CABECALHO_RENOVACAO,
-                    jwtUtil.gerarToken(jwtUtil.extrairEmail(token), jwtUtil.extrairPerfil(token)));
+                    jwtUtil.gerarToken(jwtUtil.extrairEmail(token), jwtUtil.extrairPerfil(token),
+                            jwtUtil.extrairContaId(token)));
         }
     }
 

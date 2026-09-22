@@ -18,7 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(value = "tenantTransactionManager", readOnly = true)
 public class TanqueSepticoService {
 
     // Volume útil do tanque séptico: V = 1000 + N x (C x T + K x Lf), em litros.
@@ -44,7 +44,7 @@ public class TanqueSepticoService {
     private final TanqueSepticoRepository tanqueSepticoRepository;
     private final EmpreendimentoRepository empreendimentoRepository;
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public TanqueSepticoResponseDTO criar(TanqueSepticoRequestDTO dto) {
         EmpreendimentoEntity empreendimento = empreendimentoRepository.findById(dto.getEmpreendimentoId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Empreendimento não encontrado"));
@@ -63,7 +63,7 @@ public class TanqueSepticoService {
         return toDTO(tanque);
     }
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public TanqueSepticoResponseDTO atualizar(Long id, TanqueSepticoRequestDTO dto) {
         TanqueSepticoEntity tanque = buscarEntidade(id);
 
@@ -72,7 +72,7 @@ public class TanqueSepticoService {
         return toDTO(tanque);
     }
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public void excluir(Long id) {
         tanqueSepticoRepository.delete(buscarEntidade(id));
     }

@@ -167,15 +167,3 @@ WHERE NOT EXISTS (
     SELECT 1 FROM tb_prumada
     WHERE tipo = 'ARS' AND num_pavimentos = 'ACIMA_18' AND desconector = '50mm' AND condicao_sanca = 'SEM_SANCA'
 );
-
--- USUÁRIO ADMIN INICIAL
--- Necessário porque POST /api/usuarios exige ROLE_ADMIN: sem este registro
--- não haveria como criar o primeiro usuário pela API.
--- Login: admin@hidro.com / Senha: admin123 (hash BCrypt, custo 10)
-INSERT INTO tb_usuario (nome, email, senha, perfil, ativo, criado_em)
-SELECT 'Administrador', 'admin@hidro.com',
-       '$2a$10$Ue/9FKKtJ6pXsM4yqBgU5u4MyYOlU9qfNn.ekQ812/rVmkreSKxci',
-       'ADMIN', true, now()
-WHERE NOT EXISTS (
-    SELECT 1 FROM tb_usuario WHERE email = 'admin@hidro.com'
-);

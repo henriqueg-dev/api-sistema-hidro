@@ -19,7 +19,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(value = "tenantTransactionManager", readOnly = true)
 public class OrcamentoService {
 
     private static final int VALIDADE_PADRAO_DIAS = 30;
@@ -28,7 +28,7 @@ public class OrcamentoService {
     private final ClienteRepository clienteRepository;
     private final EmpreendimentoService empreendimentoService;
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public OrcamentoResponseDTO criar(OrcamentoRequestDTO dto) {
         ClienteEntity cliente = buscarCliente(dto.getClienteId());
 
@@ -42,7 +42,7 @@ public class OrcamentoService {
         return toDTO(orcamento);
     }
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public OrcamentoResponseDTO atualizar(Long id, OrcamentoRequestDTO dto) {
         OrcamentoEntity orcamento = buscarEntidade(id);
 
@@ -52,7 +52,7 @@ public class OrcamentoService {
         return toDTO(orcamento);
     }
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public void excluir(Long id) {
         orcamentoRepository.delete(buscarEntidade(id));
     }

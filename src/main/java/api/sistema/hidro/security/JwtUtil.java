@@ -22,10 +22,11 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String gerarToken(String email, String perfil) {
+    public String gerarToken(String email, String perfil, Long contaId) {
         return Jwts.builder()
                 .subject(email)
                 .claim("perfil", perfil)
+                .claim("contaId", contaId)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey())
@@ -38,6 +39,11 @@ public class JwtUtil {
 
     public String extrairPerfil(String token) {
         return getClaims(token).get("perfil", String.class);
+    }
+
+    /** Qual banco de tenant essa sessão usa — decodificado antes de qualquer consulta ao tenant. */
+    public Long extrairContaId(String token) {
+        return getClaims(token).get("contaId", Long.class);
     }
 
     public boolean tokenValido(String token) {

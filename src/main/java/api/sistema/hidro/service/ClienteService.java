@@ -15,13 +15,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(value = "tenantTransactionManager", readOnly = true)
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
     private final EmpreendimentoRepository empreendimentoRepository;
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public ClienteResponseDTO criar(ClienteRequestDTO dto) {
         ClienteEntity cliente = ClienteEntity.builder()
                 .nome(dto.getNome())
@@ -41,7 +41,7 @@ public class ClienteService {
         return toDTO(buscarEntidade(id));
     }
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public ClienteResponseDTO atualizar(Long id, ClienteRequestDTO dto) {
         ClienteEntity cliente = buscarEntidade(id);
         cliente.setNome(dto.getNome());
@@ -50,7 +50,7 @@ public class ClienteService {
     }
 
     /** Exclusão lógica: a cliente e todos os seus empreendimentos deixam de ficar ativos. */
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public void excluir(Long id) {
         ClienteEntity cliente = buscarEntidade(id);
         cliente.setAtivo(false);

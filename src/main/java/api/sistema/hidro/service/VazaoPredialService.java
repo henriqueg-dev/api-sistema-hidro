@@ -16,7 +16,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(value = "tenantTransactionManager", readOnly = true)
 public class VazaoPredialService {
 
     /** Cada empreendimento tem um único cálculo de vazão predial. */
@@ -46,7 +46,7 @@ public class VazaoPredialService {
     private final VazaoPredialRepository vazaoPredialRepository;
     private final EmpreendimentoRepository empreendimentoRepository;
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public VazaoPredialResponseDTO criar(VazaoPredialRequestDTO dto) {
         EmpreendimentoEntity empreendimento = empreendimentoRepository.findById(dto.getEmpreendimentoId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Empreendimento não encontrado"));
@@ -65,7 +65,7 @@ public class VazaoPredialService {
         return toDTO(vazao);
     }
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public VazaoPredialResponseDTO atualizar(Long id, VazaoPredialRequestDTO dto) {
         VazaoPredialEntity vazao = buscarEntidade(id);
         aplicarCalculo(vazao, dto);
@@ -73,7 +73,7 @@ public class VazaoPredialService {
         return toDTO(vazao);
     }
 
-    @Transactional
+    @Transactional("tenantTransactionManager")
     public void excluir(Long id) {
         vazaoPredialRepository.delete(buscarEntidade(id));
     }
