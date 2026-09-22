@@ -49,6 +49,13 @@ public class EmailService {
         enviar(destinatario, "Código para redefinir sua senha", "email/recuperacao-senha", contexto);
     }
 
+    public void enviarCodigoAlteracaoSenha(String destinatario, String nome, String codigo) {
+        Context contexto = new Context();
+        contexto.setVariable("nome", nome);
+        contexto.setVariable("codigo", codigo);
+        enviar(destinatario, "Código para confirmar a alteração de senha", "email/alteracao-senha", contexto);
+    }
+
     private void enviar(String destinatario, String assunto, String template, Context contexto) {
         if (!configurado) {
             throw new RegraNegocioException("Envio de e-mail não configurado no servidor");
