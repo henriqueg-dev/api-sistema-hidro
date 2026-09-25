@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title th:text="'Memorial de cálculo - Recalque ' + ${empreendimentoNome}">Memorial de cálculo</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 1.3cm 1.6cm 1.4cm;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 9.5pt;
+      color: #1e2430;
+    }
+
+    /* ---------- Cabeçalho ---------- */
+    .faixa {
+      background: #1d4ed8;
+      color: #fff;
+      padding: 9px 16px;
+      border-radius: 6px 6px 0 0;
+    }
+    .faixa .marca {
+      font-size: 8pt;
+      font-weight: bold;
+      letter-spacing: 2px;
+      opacity: 0.85;
+      margin: 0 0 4px;
+    }
+    .faixa h1 {
+      font-size: 16pt;
+      margin: 0;
+    }
+    .cabecalho-dados {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #dbe4f3;
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 2px rgba(20, 30, 60, 0.06);
+    }
+    .cabecalho-dados td {
+      padding: 7px 14px;
+      font-size: 9pt;
+      border-bottom: 1px solid #eef1f7;
+      width: 25%;
+    }
+    .cabecalho-dados tr:last-child td {
+      border-bottom: none;
+    }
+    .cabecalho-dados td.rotulo {
+      color: #8a93a6;
+      font-size: 7.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      width: 15%;
+    }
+    .cabecalho-dados td.valor {
+      font-weight: bold;
+      color: #1e2430;
+    }
+
+    /* ---------- Seções ---------- */
+    .secao-titulo {
+      display: block;
+      background: #eef3fb;
+      border-left: 4px solid #1d4ed8;
+      color: #1d4ed8;
+      font-size: 11pt;
+      font-weight: bold;
+      padding: 4px 10px;
+      margin: 12px 0 6px;
+      border-radius: 0 4px 4px 0;
+    }
+    .secao-nota {
+      font-size: 8.5pt;
+      color: #6b7280;
+      margin: -2px 0 6px;
+    }
+
+    table.dados {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 4px;
+    }
+    table.dados tr {
+      border-bottom: 1px solid #eef1f7;
+    }
+    table.dados td {
+      padding: 6px 4px;
+      font-size: 9.5pt;
+    }
+    table.dados td.rotulo {
+      color: #6b7280;
+      width: 55%;
+    }
+    table.dados td.valor {
+      font-weight: bold;
+      text-align: right;
+      color: #1e2430;
+    }
+    table.dados td.valor .detalhe {
+      font-weight: normal;
+      color: #8a93a6;
+      font-size: 8.5pt;
+    }
+
+    /* ---------- Destaque ---------- */
+    .destaque {
+      background: #1d4ed8;
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 6px;
+      margin: 6px 0 4px;
+    }
+    .destaque .rotulo {
+      font-size: 8pt;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0.85;
+      margin: 0 0 2px;
+    }
+    .destaque .valor {
+      font-size: 16pt;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    ul.alertas {
+      margin: 4px 0 0;
+      padding-left: 18px;
+      font-size: 9pt;
+      color: #b45309;
+    }
+    ul.alertas li {
+      margin-bottom: 3px;
+    }
+
+    .rodape {
+      margin-top: 12px;
+      padding-top: 6px;
+      border-top: 1px solid #dbe4f3;
+      font-size: 7.5pt;
+      color: #8a93a6;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="faixa">
+    <p class="marca">HIDROS</p>
+    <h1>Memorial de cálculo — Recalque (reservatório inferior ao superior)</h1>
+  </div>
+  <table class="cabecalho-dados">
+    <tr>
+      <td class="rotulo">Cliente</td>
+      <td class="valor" th:text="${clienteNome}">Cliente</td>
+      <td class="rotulo">Empreendimento</td>
+      <td class="valor" th:text="${empreendimentoNome}">Empreendimento</td>
+    </tr>
+    <tr>
+      <td class="rotulo">Gerado em</td>
+      <td class="valor" colspan="3" th:text="${dataGeracao}">Data</td>
+    </tr>
+  </table>
+
+  <div class="secao-titulo">1. Dados de entrada</div>
+  <table class="dados">
+    <tr>
+      <td class="rotulo">População atendida (taxa de ocupação × unidades)</td>
+      <td class="valor" th:text="${recalque.taxaOcupacao} + ' × ' + ${recalque.numUnidades} + ' = ' + ${recalque.populacao} + ' hab'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Consumo per capita</td>
+      <td class="valor" th:text="${recalque.consumoPerCapita} + ' L/hab.dia'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Funcionamento da bomba</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(recalque.horasFuncionamento,1,'POINT',1,'COMMA')} + ' h/dia'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Rendimento do conjunto motobomba</td>
+      <td class="valor" th:text="${recalque.rendimentoPercentual} + '%'"></td>
+    </tr>
+  </table>
+
+  <div class="secao-titulo">2. Vazão de recalque</div>
+  <table class="dados">
+    <tr>
+      <td class="rotulo">Consumo diário (Cd)</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(recalque.consumoDiarioLitros,1,'POINT',0,'COMMA')} + ' L'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Q = Cd / (horas × 3600)</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(recalque.vazaoLs,1,'POINT',4,'COMMA')} + ' L/s  ('
+                    + ${#numbers.formatDecimal(recalque.vazaoM3h,1,'POINT',3,'COMMA')} + ' m³/h)'"></td>
+    </tr>
+  </table>
+
+  <div class="secao-titulo">3. Diâmetros (Forchheimer: D = 1,3 · (X/24)^¼ · raiz(Q))</div>
+  <table class="dados">
+    <tr>
+      <td class="rotulo">Diâmetro teórico de recalque</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(recalque.diametroTeoricoMm,1,'POINT',2,'COMMA')} + ' mm'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Recalque adotado</td>
+      <td class="valor" th:text="'DN ' + ${recalque.dnRecalqueMm} + ' (interno ' + ${#numbers.formatDecimal(recalque.internoRecalqueMm,1,'POINT',1,'COMMA')}
+                    + ' mm) a ' + ${#numbers.formatDecimal(recalque.velocidadeRecalqueMs,1,'POINT',2,'COMMA')} + ' m/s'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Sucção adotada (diâmetro comercial seguinte)</td>
+      <td class="valor" th:text="'DN ' + ${recalque.dnSuccaoMm} + ' (interno ' + ${#numbers.formatDecimal(recalque.internoSuccaoMm,1,'POINT',1,'COMMA')}
+                    + ' mm) a ' + ${#numbers.formatDecimal(recalque.velocidadeSuccaoMs,1,'POINT',2,'COMMA')} + ' m/s'"></td>
+    </tr>
+  </table>
+
+  <div class="secao-titulo">4. Perdas de carga (Fair-Whipple-Hsiao, NBR 5626)</div>
+  <table class="dados">
+    <tr>
+      <td class="rotulo">Sucção — conexões</td>
+      <td class="valor">
+        <span th:if="${#lists.isEmpty(recalque.conexoesSuccao)}">—</span>
+        <span th:each="c, i : ${recalque.conexoesSuccao}"
+              th:text="${c.quantidade} + ' × ' + ${c.tipo.descricao} + ' = '
+                       + ${#numbers.formatDecimal(c.comprimentoEquivalenteM,1,'POINT',2,'COMMA')} + ' m' + (${i.last} ? '' : '; ')"></span>
+      </td>
+    </tr>
+    <tr>
+      <td class="rotulo">Sucção — comprimento real + equivalente</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(recalque.comprimentoSuccao,1,'POINT',2,'COMMA')} + ' + '
+                    + ${#numbers.formatDecimal(recalque.comprimentoEquivalenteSuccaoM,1,'POINT',2,'COMMA')} + ' m'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Sucção — J e perda</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(recalque.perdaUnitariaSuccao,1,'POINT',5,'COMMA')} + ' m/m; perda de '
+                    + ${#numbers.formatDecimal(recalque.perdaCargaSuccaoM,1,'POINT',3,'COMMA')} + ' m'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Recalque — conexões</td>
+      <td class="valor">
+        <span th:if="${#lists.isEmpty(recalque.conexoesRecalque)}">—</span>
+        <span th:each="c, i : ${recalque.conexoesRecalque}"
+              th:text="${c.quantidade} + ' × ' + ${c.tipo.descricao} + ' = '
+                       + ${#numbers.formatDecimal(c.comprimentoEquivalenteM,1,'POINT',2,'COMMA')} + ' m' + (${i.last} ? '' : '; ')"></span>
+      </td>
+    </tr>
+    <tr>
+      <td class="rotulo">Recalque — comprimento real + equivalente</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(recalque.comprimentoRecalque,1,'POINT',2,'COMMA')} + ' + '
+                    + ${#numbers.formatDecimal(recalque.comprimentoEquivalenteRecalqueM,1,'POINT',2,'COMMA')} + ' m'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Recalque — J e perda</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(recalque.perdaUnitariaRecalque,1,'POINT',5,'COMMA')} + ' m/m; perda de '
+                    + ${#numbers.formatDecimal(recalque.perdaCargaRecalqueM,1,'POINT',3,'COMMA')} + ' m'"></td>
+    </tr>
+  </table>
+
+  <div class="secao-titulo">5. Altura manométrica (Hman = desníveis + perdas + V²/2g)</div>
+  <table class="dados">
+    <tr>
+      <td class="rotulo">Desnível da sucção + desnível do recalque</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(recalque.desnivelSuccao,1,'POINT',2,'COMMA')} + ' + '
+                    + ${#numbers.formatDecimal(recalque.desnivelRecalque,1,'POINT',2,'COMMA')} + ' m'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Perdas (sucção + recalque)</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(recalque.perdaCargaSuccaoM,1,'POINT',3,'COMMA')} + ' + '
+                    + ${#numbers.formatDecimal(recalque.perdaCargaRecalqueM,1,'POINT',3,'COMMA')} + ' m'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Carga de velocidade na saída (V²/2g)</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(recalque.cargaVelocidadeM,1,'POINT',3,'COMMA')} + ' m'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Altura manométrica total</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(recalque.alturaManometricaM,1,'POINT',2,'COMMA')} + ' mca'"></td>
+    </tr>
+  </table>
+
+  <div class="secao-titulo">6. Potência (P = Q · Hman / (75 · rendimento))</div>
+  <table class="dados">
+    <tr>
+      <td class="rotulo">Potência calculada</td>
+      <td class="valor" th:text="${#numbers.formatDecimal(recalque.potenciaCv,1,'POINT',2,'COMMA')} + ' cv  ('
+                    + ${#numbers.formatDecimal(recalque.potenciaKw,1,'POINT',2,'COMMA')} + ' kW)'"></td>
+    </tr>
+    <tr>
+      <td class="rotulo">Folga de projeto sobre a potência</td>
+      <td class="valor" th:text="${recalque.folgaPercentual} + '% = ' + ${#numbers.formatDecimal(recalque.potenciaComFolgaCv,1,'POINT',2,'COMMA')} + ' cv'"></td>
+    </tr>
+  </table>
+
+  <div class="destaque">
+    <p class="rotulo">Motor sugerido</p>
+    <p class="valor" th:text="${recalque.motorComercialCv != null}
+                              ? ${#numbers.formatDecimal(recalque.motorComercialCv,1,'POINT',2,'COMMA')} + ' cv'
+                              : 'Acima de 50 cv — consultar catálogo'">Motor</p>
+  </div>
+
+  <div th:if="${not #lists.isEmpty(recalque.alertas)}">
+    <div class="secao-titulo">Avisos de conformidade</div>
+    <ul class="alertas">
+      <li th:each="alerta : ${recalque.alertas}" th:text="${alerta}"></li>
+    </ul>
+  </div>
+
+  <div class="rodape">
+    A folga sobre a potência é prática de projeto, não requisito normativo; confirme o motor na curva do
+    fabricante e preveja bomba reserva. Documento gerado automaticamente pelo sistema Hidros em
+    <span th:text="${dataGeracao}"></span>, com base nos dados informados pelo usuário. O sistema não se
+    responsabiliza pela exatidão desses dados nem pelo uso deste memorial; a validação técnica é de
+    responsabilidade do responsável técnico do projeto.
+  </div>
+
+</body>
+</html>

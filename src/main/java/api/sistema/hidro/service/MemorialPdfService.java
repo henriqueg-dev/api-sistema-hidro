@@ -3,6 +3,8 @@ package api.sistema.hidro.service;
 import api.sistema.hidro.dto.OrcamentoResponseDTO;
 import api.sistema.hidro.dto.PiscinaResponseDTO;
 import api.sistema.hidro.dto.RamalPredialResponseDTO;
+import api.sistema.hidro.dto.RecalqueResponseDTO;
+import api.sistema.hidro.dto.SumidouroResponseDTO;
 import api.sistema.hidro.dto.TanqueSepticoResponseDTO;
 import api.sistema.hidro.dto.VazaoPredialResponseDTO;
 import api.sistema.hidro.entity.EmpreendimentoEntity;
@@ -33,6 +35,8 @@ public class MemorialPdfService {
     private final RamalPredialService ramalPredialService;
     private final TanqueSepticoService tanqueSepticoService;
     private final VazaoPredialService vazaoPredialService;
+    private final RecalqueService recalqueService;
+    private final SumidouroService sumidouroService;
     private final OrcamentoService orcamentoService;
     private final EmpreendimentoRepository empreendimentoRepository;
     private final TemplateEngine templateEngine;
@@ -73,6 +77,22 @@ public class MemorialPdfService {
         Context contexto = contextoBase(vazao.getEmpreendimentoId());
         contexto.setVariable("vazao", vazao);
         return renderizarPdf("memorial-vazao-predial", contexto);
+    }
+
+    @Transactional(value = "tenantTransactionManager", readOnly = true)
+    public byte[] gerarMemorialRecalque(Long id) {
+        RecalqueResponseDTO recalque = recalqueService.buscarPorId(id);
+        Context contexto = contextoBase(recalque.getEmpreendimentoId());
+        contexto.setVariable("recalque", recalque);
+        return renderizarPdf("memorial-recalque", contexto);
+    }
+
+    @Transactional(value = "tenantTransactionManager", readOnly = true)
+    public byte[] gerarMemorialSumidouro(Long id) {
+        SumidouroResponseDTO sumidouro = sumidouroService.buscarPorId(id);
+        Context contexto = contextoBase(sumidouro.getEmpreendimentoId());
+        contexto.setVariable("sumidouro", sumidouro);
+        return renderizarPdf("memorial-sumidouro", contexto);
     }
 
     @Transactional(value = "tenantTransactionManager", readOnly = true)

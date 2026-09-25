@@ -294,6 +294,67 @@ acima de **12.000 L/dia** de contribuição a NBR 7229 recomenda outra solução
 Depois do volume, o sistema resolve a geometria interna — prismático retangular
 ou cilíndrico — a partir do volume útil adotado e da profundidade útil.
 
+### Sumidouro (NBR 13969)
+
+Um único cálculo por empreendimento, que pode somar vários sumidouros iguais.
+Recebe o efluente do tanque séptico e o infiltra no solo; a contribuição diária
+costuma ser a mesma do tanque, e o sistema avisa quando diverge.
+
+Parâmetros:
+
+- `Cd` — contribuição diária de esgoto (L/dia)
+- taxa de percolação do solo (min/m), medida no ensaio do Anexo A da NBR 13969
+- `D` — diâmetro interno (m); `n` — número de sumidouros
+
+```text
+Tx      = Tabela A.1 pela taxa de percolação (interpolação linear)
+A       = Cd / Tx                  área de infiltração total (m²)
+A1      = A / n                    área por sumidouro
+A1      = πD²/4 + πD·h             fundo + parede lateral
+h       = (A1 − πD²/4) / (πD)      altura útil, arredondada para cima em 0,05 m
+```
+
+Tabela A.1 (percolação em min/m → Tx em m³/m²·dia): até 40 → 0,20; 80 → 0,14;
+120 → 0,12; 160 → 0,10; 200 → 0,09; 400 → 0,065; 600 → 0,053; 1200 → 0,037;
+1400 → 0,032; 2400 → 0,024. Acima de 2400 min/m o solo não comporta
+sumidouro, e o sistema recusa o cálculo.
+
+O sistema avisa quando D fica abaixo de 1,00 m, mínimo da NBR 17076:2024 (que
+substituiu a NBR 13969). O fundo deve ficar a pelo menos 1,50 m do nível máximo
+do lençol freático e as paredes de sumidouros vizinhos a 1,50 m entre si.
+
+### Recalque do reservatório inferior ao superior
+
+Um único cálculo por empreendimento. Dimensiona a instalação elevatória que
+leva a água do reservatório inferior ao superior.
+
+Parâmetros: taxa de ocupação, número de unidades e consumo per capita (que dão o
+consumo diário `Cd`), horas de funcionamento da bomba por dia, desnível e
+comprimento real da sucção e do recalque, conexões de cada trecho e o
+rendimento `η` do conjunto motobomba.
+
+```text
+Q       = Cd / (horas × 3600)                   vazão de recalque (L/s)
+D       = 1,3 × (horas/24)^¼ × √Q               Forchheimer, Q em m³/s, D em m
+          → recalque: menor DN, a partir de 25, com interno ≥ D
+          → sucção: o diâmetro comercial seguinte ao do recalque
+J       = 8,69×10⁶ × Q^1,75 × d^−4,75 / 10     Fair-Whipple-Hsiao (NBR 5626), m/m
+hf      = J × (comprimento real + equivalente das conexões)
+Hman    = desnível sucção + desnível recalque + hf sucção + hf recalque + V²/2g
+P       = Q × Hman / (75 × η)                   potência em cv (Q em L/s)
+```
+
+O desnível da sucção é negativo quando a bomba fica abaixo do nível d'água
+(sucção afogada). A velocidade máxima é 3,0 m/s (NBR 5626). O sistema avisa
+quando as horas passam de 6,67 h/dia, porque a vazão fica abaixo dos 15% do
+consumo diário por hora usados como critério de projeto.
+
+O motor sugerido é o menor motor usual que cobre a potência com a folga de
+projeto: 50% até 2 cv, 30% até 5 cv, 20% até 10 cv, 15% até 20 cv e 10% acima.
+Essa folga é prática de projeto, não requisito normativo — as fontes divergem
+acima de 5 cv. Rendimentos usuais: 40% a 60% até 2 cv, 70% a 75% de 2 a 5 cv,
+80% acima de 5 cv; o valor real vem da curva do fabricante.
+
 ### Piscina — conjunto de recirculação (NBR 10339)
 
 Um empreendimento pode ter várias piscinas, cada uma com bomba, filtro e circuito

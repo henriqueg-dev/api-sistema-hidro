@@ -8,6 +8,8 @@ import api.sistema.hidro.repository.ClienteRepository;
 import api.sistema.hidro.repository.EmpreendimentoRepository;
 import api.sistema.hidro.repository.PiscinaRepository;
 import api.sistema.hidro.repository.RamalPredialRepository;
+import api.sistema.hidro.repository.RecalqueRepository;
+import api.sistema.hidro.repository.SumidouroRepository;
 import api.sistema.hidro.repository.TanqueSepticoRepository;
 import api.sistema.hidro.repository.VazaoPredialRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,8 @@ public class PainelService {
     private final RamalPredialRepository ramalPredialRepository;
     private final TanqueSepticoRepository tanqueSepticoRepository;
     private final PiscinaRepository piscinaRepository;
+    private final RecalqueRepository recalqueRepository;
+    private final SumidouroRepository sumidouroRepository;
     private final EmpreendimentoService empreendimentoService;
     private final OrcamentoService orcamentoService;
     private final AuditoriaService auditoriaService;
@@ -42,8 +46,12 @@ public class PainelService {
                         vazaoPredialRepository.countByEmpreendimentoAtivoTrue()),
                 new PainelDTO.ContagemCalculo("Ramal predial e hidrômetro",
                         ramalPredialRepository.countByEmpreendimentoAtivoTrue()),
+                new PainelDTO.ContagemCalculo("Recalque",
+                        recalqueRepository.countByEmpreendimentoAtivoTrue()),
                 new PainelDTO.ContagemCalculo("Tanque séptico",
                         tanqueSepticoRepository.countByEmpreendimentoAtivoTrue()),
+                new PainelDTO.ContagemCalculo("Sumidouro",
+                        sumidouroRepository.countByEmpreendimentoAtivoTrue()),
                 new PainelDTO.ContagemCalculo("Piscina",
                         piscinaRepository.countByEmpreendimentoAtivoTrue()));
 

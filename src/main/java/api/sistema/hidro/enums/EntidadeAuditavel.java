@@ -2,11 +2,14 @@ package api.sistema.hidro.enums;
 
 import api.sistema.hidro.entity.CaixaGorduraEntity;
 import api.sistema.hidro.entity.ClienteEntity;
+import api.sistema.hidro.entity.ConexaoRecalqueEntity;
 import api.sistema.hidro.entity.ConexaoTrechoEntity;
 import api.sistema.hidro.entity.EmpreendimentoEntity;
 import api.sistema.hidro.entity.OrcamentoEntity;
 import api.sistema.hidro.entity.PiscinaEntity;
 import api.sistema.hidro.entity.RamalPredialEntity;
+import api.sistema.hidro.entity.RecalqueEntity;
+import api.sistema.hidro.entity.SumidouroEntity;
 import api.sistema.hidro.entity.TanqueSepticoEntity;
 import api.sistema.hidro.entity.TrechoPiscinaEntity;
 import api.sistema.hidro.entity.UsuarioEntity;
@@ -27,7 +30,10 @@ public enum EntidadeAuditavel {
     RAMAL_PREDIAL("Ramal predial", RamalPredialEntity.class),
     TANQUE_SEPTICO("Tanque séptico", TanqueSepticoEntity.class),
     VAZAO_PREDIAL("Vazão predial", VazaoPredialEntity.class),
-    CAIXA_GORDURA("Caixa de gordura e sabão", CaixaGorduraEntity.class);
+    CAIXA_GORDURA("Caixa de gordura e sabão", CaixaGorduraEntity.class),
+    RECALQUE("Recalque", RecalqueEntity.class),
+    CONEXAO_RECALQUE("Conexão de recalque", ConexaoRecalqueEntity.class),
+    SUMIDOURO("Sumidouro", SumidouroEntity.class);
 
     private final String descricao;
     private final Class<?> classe;

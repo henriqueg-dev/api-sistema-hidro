@@ -1,5 +1,7 @@
 package api.sistema.hidro.assistente.service;
 
+import api.sistema.hidro.dto.RecalqueResponseDTO;
+import api.sistema.hidro.dto.SumidouroResponseDTO;
 import api.sistema.hidro.entity.CaixaGorduraEntity;
 import api.sistema.hidro.entity.EmpreendimentoEntity;
 import api.sistema.hidro.entity.PiscinaEntity;
@@ -11,6 +13,8 @@ import api.sistema.hidro.repository.PiscinaRepository;
 import api.sistema.hidro.repository.RamalPredialRepository;
 import api.sistema.hidro.repository.TanqueSepticoRepository;
 import api.sistema.hidro.repository.VazaoPredialRepository;
+import api.sistema.hidro.service.RecalqueService;
+import api.sistema.hidro.service.SumidouroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +33,8 @@ public class ContextoEmpreendimento {
     private final RamalPredialRepository ramalPredialRepository;
     private final TanqueSepticoRepository tanqueSepticoRepository;
     private final PiscinaRepository piscinaRepository;
+    private final RecalqueService recalqueService;
+    private final SumidouroService sumidouroService;
 
     public String montar(EmpreendimentoEntity empreendimento) {
         StringBuilder contexto = new StringBuilder();
@@ -41,6 +47,8 @@ public class ContextoEmpreendimento {
         temCalculo |= ramaisPrediais(contexto, id);
         temCalculo |= tanquesSepticos(contexto, id);
         temCalculo |= piscinas(contexto, id);
+        temCalculo |= recalques(contexto, id);
+        temCalculo |= sumidouros(contexto, id);
 
         if (!temCalculo) {
             contexto.append("\nNenhum cálculo foi salvo para este empreendimento ainda.\n");
@@ -126,6 +134,47 @@ public class ContextoEmpreendimento {
                     .append(ramal.getVelocidadeMs()).append(" m/s, ")
                     .append("hidrômetro Qn ").append(ramal.getHidrometro().getVazaoNominalM3h())
                     .append(" m3/h\n");
+        }
+        return true;
+    }
+
+    private boolean recalques(StringBuilder contexto, Long empreendimentoId) {
+        List<RecalqueResponseDTO> recalques = recalqueService.listarPorEmpreendimento(empreendimentoId);
+
+        if (recalques.isEmpty()) return false;
+
+        contexto.append("\n## Recalque do reservatório inferior ao superior (Forchheimer)\n\n");
+        for (RecalqueResponseDTO r : recalques) {
+            contexto.append("- População ").append(r.getPopulacao())
+                    .append(", consumo diário ").append(r.getConsumoDiarioLitros()).append(" L, ")
+                    .append(r.getHorasFuncionamento()).append(" h de bomba por dia, ")
+                    .append("vazão ").append(r.getVazaoLs()).append(" L/s (").append(r.getVazaoM3h()).append(" m3/h), ")
+                    .append("recalque DN ").append(r.getDnRecalqueMm()).append(" a ").append(r.getVelocidadeRecalqueMs())
+                    .append(" m/s, sucção DN ").append(r.getDnSuccaoMm()).append(" a ").append(r.getVelocidadeSuccaoMs())
+                    .append(" m/s, desníveis ").append(r.getDesnivelSuccao()).append(" m (sucção) e ")
+                    .append(r.getDesnivelRecalque()).append(" m (recalque), perdas ")
+                    .append(r.getPerdaCargaSuccaoM()).append(" + ").append(r.getPerdaCargaRecalqueM())
+                    .append(" m, altura manométrica ").append(r.getAlturaManometricaM()).append(" m, ")
+                    .append("rendimento ").append(r.getRendimentoPercentual()).append("%, potência ")
+                    .append(r.getPotenciaCv()).append(" cv, motor sugerido ").append(r.getMotorComercialCv())
+                    .append(" cv com folga de ").append(r.getFolgaPercentual()).append("%\n");
+        }
+        return true;
+    }
+
+    private boolean sumidouros(StringBuilder contexto, Long empreendimentoId) {
+        List<SumidouroResponseDTO> sumidouros = sumidouroService.listarPorEmpreendimento(empreendimentoId);
+
+        if (sumidouros.isEmpty()) return false;
+
+        contexto.append("\n## Sumidouro (NBR 13969, Tabela A.1)\n\n");
+        for (SumidouroResponseDTO s : sumidouros) {
+            contexto.append("- Contribuição ").append(s.getContribuicaoDiariaLitros()).append(" L/dia, ")
+                    .append("percolação ").append(s.getTaxaPercolacao()).append(" min/m, ")
+                    .append("taxa de aplicação ").append(s.getTaxaAplicacao()).append(" m3/m2.dia, ")
+                    .append("área total ").append(s.getAreaTotalM2()).append(" m2 em ")
+                    .append(s.getNumSumidouros()).append(" sumidouro(s) de D = ").append(s.getDiametro())
+                    .append(" m e altura útil ").append(s.getAlturaUtilM()).append(" m\n");
         }
         return true;
     }

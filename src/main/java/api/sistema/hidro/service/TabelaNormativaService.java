@@ -32,6 +32,7 @@ public class TabelaNormativaService {
     private static final String GRUPO_AGUA_FRIA = "Água fria — NBR 5626";
     private static final String GRUPO_ESGOTO = "Esgoto sanitário — NBR 8160";
     private static final String GRUPO_TANQUE = "Tanque séptico — NBR 7229";
+    private static final String GRUPO_SUMIDOURO = "Sumidouro — NBR 13969";
     private static final String GRUPO_PISCINA = "Piscinas — NBR 10339";
 
     private static final String VAZAO_PREDIAL = "Vazão predial";
@@ -39,6 +40,8 @@ public class TabelaNormativaService {
     private static final String CAIXA_GORDURA = "Caixa de gordura e sabão";
     private static final String TANQUE_SEPTICO = "Tanque séptico";
     private static final String PISCINA = "Piscina";
+    private static final String RECALQUE = "Recalque";
+    private static final String SUMIDOURO = "Sumidouro";
 
     private final PiscinaService piscinaService;
 
@@ -49,7 +52,8 @@ public class TabelaNormativaService {
                 tubosPvc(),
                 hidrometros(),
                 limitesAlimentador(),
-                coeficientesVazaoPredial()));
+                coeficientesVazaoPredial(),
+                parametrosRecalque()));
         tabelas.addAll(TabelasNbr8160.todas(GRUPO_ESGOTO));
         tabelas.addAll(List.of(
                 caixaGordura(),
@@ -58,6 +62,7 @@ public class TabelaNormativaService {
                 acumulacaoLodo(),
                 profundidadeUtil(),
                 parametrosTanque(),
+                taxaAplicacaoSumidouro(),
                 tempoFiltracao(),
                 diametrosPiscina(piscina),
                 comprimentoEquivalente()));
@@ -114,6 +119,31 @@ public class TabelaNormativaService {
                 List.of("Parâmetro", "Valor", "Origem"), linhas,
                 "A NBR 5626 fixa a reserva mínima de 24 h de consumo, mas não como dividi-la "
                         + "entre os reservatórios.");
+    }
+
+    private TabelaNormativaDTO parametrosRecalque() {
+        List<List<String>> linhas = new ArrayList<>(List.of(
+                List.of("Vazão mínima de recalque",
+                        percentual(CalculoRecalque.FRACAO_MINIMA_HORARIA) + " do consumo diário por hora",
+                        "Critério usual de projeto"),
+                List.of("Diâmetro de recalque (Forchheimer)",
+                        "D = " + num(CalculoRecalque.FORCHHEIMER_C) + " × (h/24)^¼ × √Q", "Literatura técnica"),
+                List.of("Diâmetro de sucção", "Diâmetro comercial seguinte ao do recalque", "Literatura técnica"),
+                List.of("Velocidade máxima", num(CalculoRecalque.VELOCIDADE_MAXIMA_MS) + " m/s", "NBR 5626")));
+        double inicio = 0;
+        for (double[] faixa : CalculoRecalque.FOLGAS) {
+            linhas.add(List.of("Folga do motor — " + num(inicio) + " a " + num(faixa[0]) + " cv",
+                    num(faixa[1]) + "%", "Prática de projeto"));
+            inicio = faixa[0];
+        }
+        linhas.add(List.of("Folga do motor — acima de " + num(inicio) + " cv",
+                CalculoRecalque.FOLGA_ACIMA + "%", "Prática de projeto"));
+
+        return new TabelaNormativaDTO(GRUPO_AGUA_FRIA, "Instalação de recalque",
+                "NBR 5626 e literatura técnica", List.of(RECALQUE),
+                List.of("Parâmetro", "Valor", "Origem"), linhas,
+                "A folga sobre a potência não é normativa e varia entre fontes acima de 5 cv; "
+                        + "confirme o motor na curva do fabricante.");
     }
 
     private TabelaNormativaDTO caixaGordura() {
@@ -209,6 +239,21 @@ public class TabelaNormativaService {
                 List.of("Parâmetro", "Valor", "Origem"), linhas, null);
     }
 
+    private TabelaNormativaDTO taxaAplicacaoSumidouro() {
+        List<List<String>> linhas = new ArrayList<>();
+        for (int i = 0; i < CalculoSumidouro.TABELA_A1.size(); i++) {
+            CalculoSumidouro.PontoTabela ponto = CalculoSumidouro.TABELA_A1.get(i);
+            String percolacao = num(ponto.percolacaoMinM()) + (i == 0 ? " ou menos" : "");
+            linhas.add(List.of(percolacao, taxa(ponto.taxaAplicacao())));
+        }
+        return new TabelaNormativaDTO(GRUPO_SUMIDOURO, "Taxa máxima de aplicação diária",
+                "NBR 13969, Tabela A.1", List.of(SUMIDOURO),
+                List.of("Taxa de percolação (min/m)", "Taxa de aplicação (m³/m²·dia)"), linhas,
+                "Entre as linhas, interpolar. Acima de "
+                        + num(CalculoSumidouro.TABELA_A1.get(CalculoSumidouro.TABELA_A1.size() - 1).percolacaoMinM())
+                        + " min/m o solo não comporta sumidouro.");
+    }
+
     private TabelaNormativaDTO tempoFiltracao() {
         List<List<String>> linhas = new ArrayList<>();
         for (TipoUsoPiscina tipo : TipoUsoPiscina.values()) {
@@ -268,6 +313,11 @@ public class TabelaNormativaService {
     /** A Tabela 2 traz o período também em horas inteiras. */
     private static String horas(double dias) {
         return String.valueOf(Math.round(dias * 24));
+    }
+
+    /** Taxas da Tabela A.1 com ao menos duas casas, como na norma: 0,20 e 0,065. */
+    private static String taxa(double valor) {
+        return new DecimalFormat("0.00#", DecimalFormatSymbols.getInstance(PT_BR)).format(valor);
     }
 
     private static String percentual(double fracao) {
