@@ -16,6 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 // Em memória: só serve para uma instância.
@@ -23,7 +24,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class RateLimitFiltro extends OncePerRequestFilter {
 
-    private static final String CAMINHO_LOGIN = "/api/auth/login";
+    // Endpoints públicos que testam senha/código ou disparam e-mail: cada um com contador próprio.
+    private static final Set<String> CAMINHOS_SENSIVEIS = Set.of(
+            "/api/auth/login", "/api/auth/esqueci-senha", "/api/auth/redefinir-senha");
 
     private static final int LIMITE_ENTRADAS = 10_000;
 
@@ -54,15 +57,16 @@ public class RateLimitFiltro extends OncePerRequestFilter {
             return;
         }
 
-        boolean ehLogin = CAMINHO_LOGIN.equals(request.getRequestURI());
-        int limite = ehLogin ? loginTentativas : geralRequisicoes;
-        long janelaMs = (ehLogin ? loginJanelaSegundos : geralJanelaSegundos) * 1000;
-        String chave = request.getRemoteAddr() + (ehLogin ? ":login" : ":geral");
+        String caminho = request.getRequestURI();
+        boolean ehSensivel = CAMINHOS_SENSIVEIS.contains(caminho);
+        int limite = ehSensivel ? loginTentativas : geralRequisicoes;
+        long janelaMs = (ehSensivel ? loginJanelaSegundos : geralJanelaSegundos) * 1000;
+        String chave = request.getRemoteAddr() + (ehSensivel ? ":" + caminho : ":geral");
 
         long esperaSegundos = registrar(chave, limite, janelaMs);
 
         if (esperaSegundos > 0) {
-            responderBloqueio(response, esperaSegundos, ehLogin);
+            responderBloqueio(response, esperaSegundos, ehSensivel);
             return;
         }
 
@@ -95,10 +99,10 @@ public class RateLimitFiltro extends OncePerRequestFilter {
         return 0;
     }
 
-    private void responderBloqueio(HttpServletResponse response, long esperaSegundos, boolean ehLogin)
+    private void responderBloqueio(HttpServletResponse response, long esperaSegundos, boolean ehSensivel)
             throws IOException {
-        String mensagem = ehLogin
-                ? "Muitas tentativas de login. Aguarde " + esperaSegundos + " segundos e tente novamente."
+        String mensagem = ehSensivel
+                ? "Muitas tentativas. Aguarde " + esperaSegundos + " segundos e tente novamente."
                 : "Muitas requisições em pouco tempo. Aguarde " + esperaSegundos + " segundos.";
 
         response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());

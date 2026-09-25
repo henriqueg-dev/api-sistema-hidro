@@ -3,9 +3,12 @@ package api.sistema.hidro.controller;
 import api.sistema.hidro.dto.CaixaGorduraRequestDTO;
 import api.sistema.hidro.dto.CaixaGorduraResponseDTO;
 import api.sistema.hidro.service.CaixaGorduraService;
+import api.sistema.hidro.service.MemorialPdfService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +22,7 @@ import java.util.List;
 public class CaixaGorduraController {
 
     private final CaixaGorduraService caixaGorduraService;
+    private final MemorialPdfService memorialPdfService;
 
     @PostMapping
     public ResponseEntity<CaixaGorduraResponseDTO> criar(
@@ -43,5 +47,14 @@ public class CaixaGorduraController {
     public ResponseEntity<List<CaixaGorduraResponseDTO>> listarPorEmpreendimento(
             @PathVariable Long empreendimentoId) {
         return ResponseEntity.ok(caixaGorduraService.listarPorEmpreendimento(empreendimentoId));
+    }
+
+    @GetMapping("/{id}/memorial.pdf")
+    public ResponseEntity<byte[]> memorialPdf(@PathVariable Long id) {
+        byte[] pdf = memorialPdfService.gerarMemorialCaixaGordura(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"memorial-caixa-gordura-" + id + ".pdf\"")
+                .body(pdf);
     }
 }

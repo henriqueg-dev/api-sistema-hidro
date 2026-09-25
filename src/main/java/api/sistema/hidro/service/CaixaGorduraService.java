@@ -69,6 +69,12 @@ public class CaixaGorduraService {
         caixaGorduraRepository.delete(caixaGordura);
     }
 
+    public CaixaGorduraResponseDTO buscarPorId(Long id) {
+        return caixaGorduraRepository.findById(id)
+                .map(this::toDTO)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Cálculo de caixa de gordura não encontrado"));
+    }
+
     public List<CaixaGorduraResponseDTO> listarPorEmpreendimento(Long empreendimentoId) {
         return caixaGorduraRepository.findByEmpreendimentoIdOrderByCriadoEmAsc(empreendimentoId)
                 .stream()

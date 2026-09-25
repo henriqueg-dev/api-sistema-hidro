@@ -1,5 +1,6 @@
 package api.sistema.hidro.service;
 
+import api.sistema.hidro.dto.CaixaGorduraResponseDTO;
 import api.sistema.hidro.dto.OrcamentoResponseDTO;
 import api.sistema.hidro.dto.PiscinaResponseDTO;
 import api.sistema.hidro.dto.RamalPredialResponseDTO;
@@ -37,6 +38,7 @@ public class MemorialPdfService {
     private final VazaoPredialService vazaoPredialService;
     private final RecalqueService recalqueService;
     private final SumidouroService sumidouroService;
+    private final CaixaGorduraService caixaGorduraService;
     private final OrcamentoService orcamentoService;
     private final EmpreendimentoRepository empreendimentoRepository;
     private final TemplateEngine templateEngine;
@@ -93,6 +95,14 @@ public class MemorialPdfService {
         Context contexto = contextoBase(sumidouro.getEmpreendimentoId());
         contexto.setVariable("sumidouro", sumidouro);
         return renderizarPdf("memorial-sumidouro", contexto);
+    }
+
+    @Transactional(value = "tenantTransactionManager", readOnly = true)
+    public byte[] gerarMemorialCaixaGordura(Long id) {
+        CaixaGorduraResponseDTO caixa = caixaGorduraService.buscarPorId(id);
+        Context contexto = contextoBase(caixa.getEmpreendimentoId());
+        contexto.setVariable("caixa", caixa);
+        return renderizarPdf("memorial-caixa-gordura", contexto);
     }
 
     @Transactional(value = "tenantTransactionManager", readOnly = true)

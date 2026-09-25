@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Service
@@ -19,7 +20,7 @@ import java.time.LocalDateTime;
 public class CodigoVerificacaoService {
 
     private static final SecureRandom ALEATORIO = new SecureRandom();
-    private static final String MSG_CODIGO_INVALIDO = "Código inválido ou expirado";
+    public static final String MSG_CODIGO_INVALIDO = "Código inválido ou expirado";
 
     private final CodigoVerificacaoRepository codigoVerificacaoRepository;
     private final PasswordEncoder passwordEncoder;
@@ -36,9 +37,7 @@ public class CodigoVerificacaoService {
     @Transactional("tenantTransactionManager")
     public String gerar(UsuarioEntity usuario, FinalidadeCodigo finalidade) {
         String codigo = String.format("%06d", ALEATORIO.nextInt(1_000_000));
-        long minutos = finalidade == FinalidadeCodigo.CONVITE
-                ? expiracaoConviteMinutos
-                : expiracaoRecuperacaoMinutos;
+        long minutos = expiracaoMinutos(finalidade);
 
         CodigoVerificacaoEntity entidade = codigoVerificacaoRepository.findByUsuario(usuario)
                 .orElseGet(() -> CodigoVerificacaoEntity.builder().usuario(usuario).build());
@@ -50,6 +49,16 @@ public class CodigoVerificacaoService {
         codigoVerificacaoRepository.save(entidade);
 
         return codigo;
+    }
+
+    /** Emissão é derivada da expiração: expiraEm − validade da finalidade. */
+    @Transactional(value = "tenantTransactionManager", readOnly = true)
+    public boolean emitidoHaMenosDe(UsuarioEntity usuario, FinalidadeCodigo finalidade, Duration intervalo) {
+        LocalDateTime limite = LocalDateTime.now().minus(intervalo);
+        return codigoVerificacaoRepository.findByUsuario(usuario)
+                .filter(entidade -> entidade.getFinalidade() == finalidade)
+                .map(entidade -> entidade.getExpiraEm().minusMinutes(expiracaoMinutos(finalidade)).isAfter(limite))
+                .orElse(false);
     }
 
     @Transactional("tenantTransactionManager")
@@ -75,5 +84,9 @@ public class CodigoVerificacaoService {
         FinalidadeCodigo finalidade = entidade.getFinalidade();
         codigoVerificacaoRepository.delete(entidade);
         return finalidade;
+    }
+
+    private long expiracaoMinutos(FinalidadeCodigo finalidade) {
+        return finalidade == FinalidadeCodigo.CONVITE ? expiracaoConviteMinutos : expiracaoRecuperacaoMinutos;
     }
 }
