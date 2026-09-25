@@ -31,19 +31,16 @@ public class AssinaturaService {
 
     public AssinaturaResponseDTO statusAtual() {
         AssinaturaEntity assinatura = buscarAtual();
-        return new AssinaturaResponseDTO(assinatura.getPlano(), assinatura.getStatus(), assinatura.getExpiraEm());
+        return new AssinaturaResponseDTO(assinatura.getPlano(), assinatura.statusEfetivo(), assinatura.getExpiraEm());
     }
 
     @Transactional("catalogoTransactionManager")
     public CobrancaPixResponseDTO gerarCobranca(PlanoAssinatura plano) {
         AssinaturaEntity assinatura = buscarAtual();
 
-        AbacatePayService.CobrancaPix cobranca = abacatePayService.criarCobranca(
-                assinatura.getContaId(),
-                "Assinatura SistemaHidro — plano " + plano.getDescricao(),
-                plano.getPrecoCentavos());
+        AbacatePayService.CobrancaPix cobranca = abacatePayService.criarCobranca(assinatura.getContaId(), plano);
 
-        assinatura.setPlano(plano);
+        // O plano só muda no pagamento: gravá-lo aqui liberaria os limites dele sem pagar.
         assinatura.setAbacatePayCobrancaId(cobranca.id());
         assinaturaRepository.save(assinatura);
 
@@ -59,7 +56,7 @@ public class AssinaturaService {
      * reentrega do mesmo evento não estende a assinatura duas vezes.
      */
     @Transactional("catalogoTransactionManager")
-    public void confirmarPagamento(Long contaId, String abacatePayCobrancaId) {
+    public void confirmarPagamento(Long contaId, String abacatePayCobrancaId, PlanoAssinatura planoPago) {
         AssinaturaEntity assinatura = assinaturaRepository.findById(contaId).orElse(null);
         if (assinatura == null) {
             log.warn("Webhook de pagamento para conta desconhecida: {}", contaId);
@@ -76,13 +73,17 @@ public class AssinaturaService {
                 : agora;
         StatusAssinatura statusAnterior = assinatura.getStatus();
 
+        // Cobrança antiga, sem plano no metadata: mantém o plano atual.
+        if (planoPago != null) {
+            assinatura.setPlano(planoPago);
+        }
         assinatura.setStatus(StatusAssinatura.ATIVA);
         assinatura.setExpiraEm(baseRenovacao.plusMonths(1));
         assinatura.setUltimaCobrancaConfirmadaId(abacatePayCobrancaId);
         assinaturaRepository.save(assinatura);
 
-        log.info("Pagamento confirmado: conta {} cobrança {} — status {} -> ATIVA, expira em {}",
-                contaId, abacatePayCobrancaId, statusAnterior, assinatura.getExpiraEm());
+        log.info("Pagamento confirmado: conta {} cobrança {} plano {} — status {} -> ATIVA, expira em {}",
+                contaId, abacatePayCobrancaId, assinatura.getPlano(), statusAnterior, assinatura.getExpiraEm());
     }
 
     /** Roda uma vez por dia; contas vencidas perdem acesso até gerar e pagar nova cobrança. */

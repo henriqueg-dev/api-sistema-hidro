@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 /** Cálculos, orçamentos e memoriais em PDF são ilimitados em todo plano; o que varia é gente e IA. */
 public enum PlanoAssinatura {
 
-    STARTER("Starter", 4900, 2, 0),
-    PROFISSIONAL("Profissional", 9900, 5, 300),
-    ESCRITORIO("Escritório", 19900, -1, -1);
+    STARTER("Starter", 7990, 2, 0),
+    PROFISSIONAL("Profissional", 14990, 5, 300),
+    ESCRITORIO("Escritório", 24990, -1, -1);
 
     private final String descricao;
     private final long precoCentavos;

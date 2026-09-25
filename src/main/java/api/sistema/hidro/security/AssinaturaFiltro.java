@@ -46,7 +46,7 @@ public class AssinaturaFiltro extends OncePerRequestFilter {
         }
 
         StatusAssinatura status = assinaturaRepository.findById(usuario.getContaId())
-                .map(AssinaturaEntity::getStatus)
+                .map(AssinaturaEntity::statusEfetivo)
                 .orElse(StatusAssinatura.EXPIRADA);
 
         if (status != StatusAssinatura.ATIVA) {

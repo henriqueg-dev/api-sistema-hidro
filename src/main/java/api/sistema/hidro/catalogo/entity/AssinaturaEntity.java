@@ -47,4 +47,10 @@ public class AssinaturaEntity {
 
     @UpdateTimestamp
     private LocalDateTime atualizadoEm;
+
+    /** ATIVA com expira_em vencido ou vazio conta como EXPIRADA, sem esperar o job diário. */
+    public StatusAssinatura statusEfetivo() {
+        boolean vencida = expiraEm == null || !expiraEm.isAfter(LocalDateTime.now());
+        return status == StatusAssinatura.ATIVA && vencida ? StatusAssinatura.EXPIRADA : status;
+    }
 }

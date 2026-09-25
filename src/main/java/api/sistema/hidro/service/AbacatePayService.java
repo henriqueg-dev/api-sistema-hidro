@@ -1,5 +1,6 @@
 package api.sistema.hidro.service;
 
+import api.sistema.hidro.enums.PlanoAssinatura;
 import api.sistema.hidro.exception.RegraNegocioException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.text.Normalizer;
 import java.util.Map;
 
 /**
@@ -30,12 +32,17 @@ public class AbacatePayService {
                 .build();
     }
 
+    // A AbacatePay recusa caracteres fora do ASCII na descrição (ex.: "—"); "Escritório" vira "Escritorio".
+    private static String semAcentos(String texto) {
+        return Normalizer.normalize(texto, Normalizer.Form.NFD).replaceAll("\\p{M}", "");
+    }
+
     public record CobrancaPix(String id, String brCode, String brCodeBase64) {
     }
 
-    /** Gera um PIX Checkout Transparente. Valor em reais; a API trabalha em centavos. */
+    /** Gera um PIX Checkout Transparente; o plano vai no metadata e volta no webhook. */
     @SuppressWarnings("unchecked")
-    public CobrancaPix criarCobranca(long contaId, String descricao, long valorCentavos) {
+    public CobrancaPix criarCobranca(long contaId, PlanoAssinatura plano) {
         if (!configurado) {
             throw new RegraNegocioException("Pagamento não configurado no servidor");
         }
@@ -47,9 +54,11 @@ public class AbacatePayService {
                     .body(Map.of(
                             "method", "PIX",
                             "data", Map.of(
-                                    "amount", valorCentavos,
-                                    "description", descricao,
-                                    "metadata", Map.of("contaId", String.valueOf(contaId)))))
+                                    "amount", plano.getPrecoCentavos(),
+                                    "description", "Assinatura Hidros - plano " + semAcentos(plano.getDescricao()),
+                                    "metadata", Map.of(
+                                            "contaId", String.valueOf(contaId),
+                                            "plano", plano.name()))))
                     .retrieve()
                     .body(Map.class);
 

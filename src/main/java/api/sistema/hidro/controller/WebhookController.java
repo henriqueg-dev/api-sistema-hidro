@@ -1,5 +1,6 @@
 package api.sistema.hidro.controller;
 
+import api.sistema.hidro.enums.PlanoAssinatura;
 import api.sistema.hidro.service.AssinaturaService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,12 +59,23 @@ public class WebhookController {
         if (raiz.path("event").asText("").equals("transparent.completed")) {
             String cobrancaId = dados.path("id").asText(null);
             Long contaId = dados.path("metadata").path("contaId").asLong(0);
+            PlanoAssinatura plano = planoDoMetadata(dados.path("metadata").path("plano").asText(""));
             if (cobrancaId != null && contaId > 0) {
-                assinaturaService.confirmarPagamento(contaId, cobrancaId);
+                assinaturaService.confirmarPagamento(contaId, cobrancaId, plano);
             }
         }
 
         return ResponseEntity.ok().build();
+    }
+
+    // Plano desconhecido não pode derrubar a confirmação de um pagamento real.
+    private PlanoAssinatura planoDoMetadata(String valor) {
+        try {
+            return valor.isBlank() ? null : PlanoAssinatura.valueOf(valor);
+        } catch (IllegalArgumentException e) {
+            log.warn("Plano desconhecido no metadata do webhook: {}", valor);
+            return null;
+        }
     }
 
     private boolean assinaturaValida(String corpo, String assinaturaRecebida) {
