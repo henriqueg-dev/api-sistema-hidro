@@ -18,4 +18,6 @@ public interface ClienteRepository extends JpaRepository<ClienteEntity, Long> {
             order by e.nome
             """)
     List<ClienteEntity> buscarPorNome(@Param("busca") String busca);
+
+    long countByAtivoTrue();
 }

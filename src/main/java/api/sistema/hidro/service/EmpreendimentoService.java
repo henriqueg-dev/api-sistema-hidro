@@ -49,6 +49,13 @@ public class EmpreendimentoService {
                 .toList();
     }
 
+    public List<EmpreendimentoResponseDTO> recentes() {
+        return empreendimentoRepository.findTop5ByAtivoTrueOrderByCriadoEmDesc()
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
     public EmpreendimentoResponseDTO buscarPorId(Long id) {
         return toDTO(buscarEntidade(id));
     }

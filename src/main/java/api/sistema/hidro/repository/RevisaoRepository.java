@@ -12,4 +12,6 @@ public interface RevisaoRepository extends JpaRepository<RevisaoEntity, Integer>
     List<RevisaoEntity> findTop200ByOrderByIdDesc();
 
     List<RevisaoEntity> findAllByOrderByIdDesc();
+
+    List<RevisaoEntity> findTop5ByOrderByIdDesc();
 }

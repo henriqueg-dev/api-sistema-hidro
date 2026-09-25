@@ -10,4 +10,6 @@ import java.util.List;
 public interface PiscinaRepository extends JpaRepository<PiscinaEntity, Long> {
 
     List<PiscinaEntity> findByEmpreendimentoIdOrderByCriadoEmAsc(Long empreendimentoId);
+
+    long countByEmpreendimentoAtivoTrue();
 }

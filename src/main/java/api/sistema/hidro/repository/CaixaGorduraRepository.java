@@ -12,4 +12,6 @@ public interface CaixaGorduraRepository extends JpaRepository<CaixaGorduraEntity
     List<CaixaGorduraEntity> findByEmpreendimentoIdOrderByCriadoEmAsc(Long empreendimentoId);
 
     long countByEmpreendimentoId(Long empreendimentoId);
+
+    long countByEmpreendimentoAtivoTrue();
 }

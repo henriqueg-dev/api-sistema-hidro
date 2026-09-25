@@ -71,6 +71,15 @@ public class AuditoriaService {
                 .toList();
     }
 
+    /** As cinco revisões mais novas, para o painel da tela inicial. */
+    public List<RevisaoResponseDTO> recentes() {
+        AuditReader leitor = AuditReaderFactory.get(entityManager);
+        return revisaoRepository.findTop5ByOrderByIdDesc()
+                .stream()
+                .map(revisao -> paraDTO(leitor, revisao))
+                .toList();
+    }
+
     private RevisaoResponseDTO paraDTO(AuditReader leitor, RevisaoEntity revisao) {
         return new RevisaoResponseDTO(
                 revisao.getId(),

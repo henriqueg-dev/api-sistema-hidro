@@ -22,4 +22,8 @@ public interface EmpreendimentoRepository extends JpaRepository<EmpreendimentoEn
             """)
     List<EmpreendimentoEntity> buscarPorCliente(@Param("clienteId") Long clienteId,
                                                 @Param("busca") String busca);
+
+    long countByAtivoTrue();
+
+    List<EmpreendimentoEntity> findTop5ByAtivoTrueOrderByCriadoEmDesc();
 }
