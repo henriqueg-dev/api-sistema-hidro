@@ -1,6 +1,7 @@
 package api.sistema.hidro.controller;
 
-import api.sistema.hidro.dto.AlterarSenhaDTO;
+import api.sistema.hidro.dto.ConfirmarAlteracaoSenhaDTO;
+import api.sistema.hidro.dto.SolicitarAlteracaoSenhaDTO;
 import api.sistema.hidro.dto.UsuarioRequestDTO;
 import api.sistema.hidro.dto.UsuarioResponseDTO;
 import api.sistema.hidro.service.UsuarioService;
@@ -32,9 +33,15 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.listarTodos());
     }
 
+    @PostMapping("/me/senha/codigo")
+    public ResponseEntity<Void> solicitarAlteracaoSenha(@RequestBody @Valid SolicitarAlteracaoSenhaDTO dto) {
+        usuarioService.solicitarAlteracaoSenha(dto.getSenhaAtual());
+        return ResponseEntity.noContent().build();
+    }
+
     @PatchMapping("/me/senha")
-    public ResponseEntity<Void> alterarSenhaPropria(@RequestBody @Valid AlterarSenhaDTO dto) {
-        usuarioService.alterarSenhaPropria(dto.getSenhaAtual(), dto.getNovaSenha());
+    public ResponseEntity<Void> confirmarAlteracaoSenha(@RequestBody @Valid ConfirmarAlteracaoSenhaDTO dto) {
+        usuarioService.confirmarAlteracaoSenha(dto.getCodigo(), dto.getNovaSenha());
         return ResponseEntity.noContent().build();
     }
 

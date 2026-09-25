@@ -73,7 +73,11 @@ V  = Cd x d / 1000     = 270,0 m3
 O cadastro segue a hierarquia Cliente, Empreendimento e Cálculos.
 
 Cada empreendimento guarda: nome, tipo (CASA, PREDIO ou GALPAO), número de
-pavimentos, endereço, concessionária e o cliente responsável. Os cálculos são
+pavimentos, endereço, concessionária e o cliente responsável. Guarda também,
+opcionalmente, os dados de projeto: número de unidades, taxa de ocupação
+(hab/unidade) e consumo per capita (L/hab·dia). Esses dados pré-preenchem os
+formulários de cálculo, mas cada cálculo salvo grava os próprios valores, que
+podem divergir do cadastro. Os cálculos são
 sempre feitos sobre um empreendimento e ficam salvos nele, podendo ser
 alterados ou removidos depois.
 
@@ -90,10 +94,12 @@ embutido neste documento.
 Cada parâmetro deve ser preenchido nesta ordem de prioridade:
 
 1. **Dado do empreendimento selecionado.** Leia da mensagem de contexto — tanto
-   o cadastro (tipo, número de pavimentos, concessionária) quanto os cálculos já
-   salvos (taxa de ocupação, número de apartamentos, consumo per capita, dias de
-   reservação). Se o valor está lá, ele manda, mesmo que você o considere
-   atípico. Nesse caso comente a estranheza, mas calcule com o valor real.
+   o cadastro (tipo, número de pavimentos, concessionária e os dados de projeto,
+   quando preenchidos) quanto os cálculos já salvos (taxa de ocupação, número de
+   apartamentos, consumo per capita, dias de reservação). Para um cálculo, o valor
+   salvo nele vale mais que o do cadastro. Se o valor está lá, ele manda, mesmo
+   que você o considere atípico. Nesse caso comente a estranheza, mas calcule
+   com o valor real.
 2. **Valor informado pelo usuário na pergunta.** Se divergir do que está
    cadastrado, use o que ele informou e avise sobre a divergência.
 3. **Referência normativa adequada a este empreendimento.** Quando o parâmetro

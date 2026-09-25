@@ -98,12 +98,25 @@ public class UsuarioService {
     }
 
     @Transactional("tenantTransactionManager")
-    public void alterarSenhaPropria(String senhaAtual, String novaSenha) {
+    public void solicitarAlteracaoSenha(String senhaAtual) {
         UsuarioEntity usuarioEntity = usuarioRepository.findByEmail(emailAutenticado())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
 
         if (!passwordEncoder.matches(senhaAtual, usuarioEntity.getSenha())) {
             throw new RegraNegocioException("Senha atual incorreta");
+        }
+
+        String codigo = codigoVerificacaoService.gerar(usuarioEntity, FinalidadeCodigo.ALTERACAO_SENHA);
+        emailService.enviarCodigoAlteracaoSenha(usuarioEntity.getEmail(), usuarioEntity.getNome(), codigo);
+    }
+
+    @Transactional("tenantTransactionManager")
+    public void confirmarAlteracaoSenha(String codigo, String novaSenha) {
+        UsuarioEntity usuarioEntity = usuarioRepository.findByEmail(emailAutenticado())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
+
+        if (codigoVerificacaoService.validar(usuarioEntity, codigo) != FinalidadeCodigo.ALTERACAO_SENHA) {
+            throw new RegraNegocioException("Código inválido ou expirado");
         }
 
         usuarioEntity.setSenha(passwordEncoder.encode(novaSenha));

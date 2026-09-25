@@ -12,4 +12,6 @@ public interface RamalPredialRepository extends JpaRepository<RamalPredialEntity
     List<RamalPredialEntity> findByEmpreendimentoIdOrderByCriadoEmAsc(Long empreendimentoId);
 
     long countByEmpreendimentoId(Long empreendimentoId);
+
+    long countByEmpreendimentoAtivoTrue();
 }

@@ -38,6 +38,13 @@ public class EmpreendimentoEntity {
     @Column(nullable = false)
     private String concessionaria;
 
+    // Dados de projeto opcionais: pré-preenchem os cálculos do empreendimento.
+    private Integer numUnidades;
+
+    private Integer taxaOcupacao;
+
+    private Integer consumoPerCapita;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id", nullable = false)
     private ClienteEntity cliente;

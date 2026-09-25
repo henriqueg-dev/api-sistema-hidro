@@ -36,6 +36,21 @@ public class TanqueSepticoService {
 
     public static final int VAZAO_MAXIMA_LITROS_DIA = 12_000;
 
+    /** Linha da Tabela 2 da NBR 7229: período de detenção até a contribuição diária informada. */
+    public record FaixaDetencao(int ateLitrosDia, double dias) {
+    }
+
+    public static final List<FaixaDetencao> PERIODOS_DETENCAO = List.of(
+            new FaixaDetencao(1500, 1.00),
+            new FaixaDetencao(3000, 0.92),
+            new FaixaDetencao(4500, 0.83),
+            new FaixaDetencao(6000, 0.75),
+            new FaixaDetencao(7500, 0.67),
+            new FaixaDetencao(9000, 0.58));
+
+    /** Período de detenção acima da última faixa da Tabela 2, em dias. */
+    public static final double PERIODO_DETENCAO_ACIMA_DIAS = 0.50;
+
     /** Cada empreendimento tem um único cálculo de tanque séptico. */
     public static final int MAX_POR_EMPREENDIMENTO = 1;
 
@@ -149,13 +164,10 @@ public class TanqueSepticoService {
      * total. Quanto maior a vazão, menor o tempo que o efluente permanece no tanque.
      */
     private double periodoDetencaoDias(int contribuicaoDiariaLitros) {
-        if (contribuicaoDiariaLitros <= 1500) return 1.00;
-        if (contribuicaoDiariaLitros <= 3000) return 0.92;
-        if (contribuicaoDiariaLitros <= 4500) return 0.83;
-        if (contribuicaoDiariaLitros <= 6000) return 0.75;
-        if (contribuicaoDiariaLitros <= 7500) return 0.67;
-        if (contribuicaoDiariaLitros <= 9000) return 0.58;
-        return 0.50;
+        for (FaixaDetencao faixa : PERIODOS_DETENCAO) {
+            if (contribuicaoDiariaLitros <= faixa.ateLitrosDia()) return faixa.dias();
+        }
+        return PERIODO_DETENCAO_ACIMA_DIAS;
     }
 
     private static double arredondar(double valor, int casas) {

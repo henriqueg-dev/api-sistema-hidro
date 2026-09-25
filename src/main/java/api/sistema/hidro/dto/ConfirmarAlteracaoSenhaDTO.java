@@ -7,10 +7,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AlterarSenhaDTO {
+public class ConfirmarAlteracaoSenhaDTO {
 
-    @NotBlank(message = "Senha atual é obrigatória")
-    private String senhaAtual;
+    @NotBlank(message = "Código é obrigatório")
+    private String codigo;
 
     @NotBlank(message = "Nova senha é obrigatória")
     @Size(min = 8, message = "Nova senha deve ter no mínimo 8 caracteres")

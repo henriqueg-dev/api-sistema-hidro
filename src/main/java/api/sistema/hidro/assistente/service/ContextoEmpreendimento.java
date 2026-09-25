@@ -56,6 +56,17 @@ public class ContextoEmpreendimento {
                 .append("- Pavimentos: ").append(empreendimento.getNumPavimentos()).append('\n')
                 .append("- Endereço: ").append(empreendimento.getEndereco()).append('\n')
                 .append("- Concessionária: ").append(empreendimento.getConcessionaria()).append('\n');
+
+        dadoDeProjeto(contexto, "Número de unidades", empreendimento.getNumUnidades(), "");
+        dadoDeProjeto(contexto, "Taxa de ocupação", empreendimento.getTaxaOcupacao(), " hab/unidade");
+        dadoDeProjeto(contexto, "Consumo per capita", empreendimento.getConsumoPerCapita(), " L/hab·dia");
+    }
+
+    /** Dado de projeto é opcional no cadastro: só entra no contexto quando preenchido. */
+    private void dadoDeProjeto(StringBuilder contexto, String rotulo, Integer valor, String unidade) {
+        if (valor != null) {
+            contexto.append("- ").append(rotulo).append(": ").append(valor).append(unidade).append('\n');
+        }
     }
 
     private boolean caixasGordura(StringBuilder contexto, Long empreendimentoId) {

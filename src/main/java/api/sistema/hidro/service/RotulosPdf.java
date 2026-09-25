@@ -10,7 +10,7 @@ import api.sistema.hidro.enums.UnidadeContribuicao;
 import java.util.Map;
 
 /**
- * Rótulos em português para os memoriais em PDF. Os enums aqui não carregam descrição (o
+ * Rótulos em português para os memoriais em PDF e as tabelas normativas. Os enums aqui não carregam descrição (o
  * frontend mantém os próprios rótulos em constants/opcoes.js, sem afetar o JSON da API) —
  * esta classe espelha esses mesmos textos só para exibição no documento.
  */

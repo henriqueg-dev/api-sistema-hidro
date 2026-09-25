@@ -12,4 +12,6 @@ public interface TanqueSepticoRepository extends JpaRepository<TanqueSepticoEnti
     List<TanqueSepticoEntity> findByEmpreendimentoIdOrderByCriadoEmAsc(Long empreendimentoId);
 
     long countByEmpreendimentoId(Long empreendimentoId);
+
+    long countByEmpreendimentoAtivoTrue();
 }
