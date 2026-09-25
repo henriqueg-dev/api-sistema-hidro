@@ -96,10 +96,20 @@ public class OrcamentoService {
         empreendimentoDTO.setNumPavimentos(dto.getNumPavimentos());
         empreendimentoDTO.setEndereco(dto.getEndereco());
         empreendimentoDTO.setConcessionaria(dto.getConcessionaria());
+        empreendimentoDTO.setNumUnidades(unidadesOrcadas(orcamento));
         empreendimentoDTO.setClienteId(orcamento.getCliente().getId());
 
         EmpreendimentoResponseDTO criado = empreendimentoService.criar(empreendimentoDTO);
         orcamento.setEmpreendimentoGeradoId(criado.getId());
+    }
+
+    /** Prédio é orçado por apartamento; casa é uma unidade; galpão, por m², não informa. */
+    private Integer unidadesOrcadas(OrcamentoEntity orcamento) {
+        return switch (orcamento.getTipoEmpreendimento()) {
+            case PREDIO -> (int) Math.round(orcamento.getQuantidade());
+            case CASA -> 1;
+            case GALPAO -> null;
+        };
     }
 
     private ClienteEntity buscarCliente(Long id) {

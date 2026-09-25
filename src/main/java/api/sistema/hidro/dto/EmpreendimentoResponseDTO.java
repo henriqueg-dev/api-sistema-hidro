@@ -17,6 +17,9 @@ public class EmpreendimentoResponseDTO {
     private Integer numPavimentos;
     private String endereco;
     private String concessionaria;
+    private Integer numUnidades;
+    private Integer taxaOcupacao;
+    private Integer consumoPerCapita;
     private Long clienteId;
     private String clienteNome;
     private Boolean ativo;

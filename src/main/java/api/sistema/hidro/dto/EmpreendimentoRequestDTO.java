@@ -26,6 +26,15 @@ public class EmpreendimentoRequestDTO {
     @NotBlank(message = "Concessionária é obrigatória")
     private String concessionaria;
 
+    @Positive(message = "Número de unidades deve ser maior que zero")
+    private Integer numUnidades;
+
+    @Positive(message = "Taxa de ocupação deve ser maior que zero")
+    private Integer taxaOcupacao;
+
+    @Positive(message = "Consumo per capita deve ser maior que zero")
+    private Integer consumoPerCapita;
+
     @NotNull(message = "Cliente é obrigatório")
     private Long clienteId;
 }

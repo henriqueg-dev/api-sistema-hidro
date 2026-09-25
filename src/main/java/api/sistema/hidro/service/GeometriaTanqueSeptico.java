@@ -3,6 +3,7 @@ package api.sistema.hidro.service;
 import api.sistema.hidro.enums.FormaTanque;
 import api.sistema.hidro.exception.RegraNegocioException;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -34,10 +35,20 @@ public final class GeometriaTanqueSeptico {
      */
     public record Faixa(int minimoCm, int maximoCm) {
 
+        /** Tabela 4 da NBR 7229, por volume útil máximo da faixa (m³); nulo vale acima da anterior. */
+        public static final List<PorVolume> POR_VOLUME = List.of(
+                new PorVolume(6.0, new Faixa(120, 220)),
+                new PorVolume(10.0, new Faixa(150, 250)),
+                new PorVolume(null, new Faixa(180, 280)));
+
+        public record PorVolume(Double ateM3, Faixa faixa) {
+        }
+
         public static Faixa para(double volumeUtilM3) {
-            if (volumeUtilM3 <= 6.0) return new Faixa(120, 220);
-            if (volumeUtilM3 <= 10.0) return new Faixa(150, 250);
-            return new Faixa(180, 280);
+            for (PorVolume linha : POR_VOLUME) {
+                if (linha.ateM3() == null || volumeUtilM3 <= linha.ateM3()) return linha.faixa();
+            }
+            throw new IllegalStateException("Tabela 4 sem faixa final");
         }
 
         public double minimoM() {

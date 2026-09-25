@@ -32,6 +32,9 @@ public class EmpreendimentoService {
                 .numPavimentos(dto.getNumPavimentos())
                 .endereco(dto.getEndereco())
                 .concessionaria(dto.getConcessionaria())
+                .numUnidades(dto.getNumUnidades())
+                .taxaOcupacao(dto.getTaxaOcupacao())
+                .consumoPerCapita(dto.getConsumoPerCapita())
                 .cliente(cliente)
                 .build();
 
@@ -59,6 +62,9 @@ public class EmpreendimentoService {
         empreendimento.setNumPavimentos(dto.getNumPavimentos());
         empreendimento.setEndereco(dto.getEndereco());
         empreendimento.setConcessionaria(dto.getConcessionaria());
+        empreendimento.setNumUnidades(dto.getNumUnidades());
+        empreendimento.setTaxaOcupacao(dto.getTaxaOcupacao());
+        empreendimento.setConsumoPerCapita(dto.getConsumoPerCapita());
         empreendimentoRepository.save(empreendimento);
         return toDTO(empreendimento);
     }
@@ -80,7 +86,8 @@ public class EmpreendimentoService {
         return new EmpreendimentoResponseDTO(
                 e.getId(), e.getNome(), e.getTipo(),
                 e.getNumPavimentos(), e.getEndereco(),
-                e.getConcessionaria(), e.getCliente().getId(),
+                e.getConcessionaria(), e.getNumUnidades(),
+                e.getTaxaOcupacao(), e.getConsumoPerCapita(), e.getCliente().getId(),
                 e.getCliente().getNome(), e.getAtivo(), e.getCriadoEm());
     }
 }
